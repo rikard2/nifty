@@ -25,6 +25,20 @@ function createWindow () {
 const template = [
     {},
     {
+        label: 'File',
+        submenu: [
+            {
+                label: 'New',
+                accelerator: 'Cmd+N',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'new'
+                    });
+                }
+            }
+        ]
+    },
+    {
         label: 'Execute',
         submenu: [
             {

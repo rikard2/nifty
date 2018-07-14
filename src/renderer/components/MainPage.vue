@@ -4,6 +4,9 @@
     <div class="treeview">Treeview</div>
     <div class="editor">
         <div class="middle">
+            <div class="tabs">
+                <tabs></tabs>
+            </div>
             <div class="first">
                 <editor></editor>
             </div>
@@ -14,7 +17,7 @@
     </div>
   </div>
   <div class="bottom">
-    <div class="filename">{{ filename }}</div>
+    <div class="filename">{{ $store.state.filename }}</div>
   </div>
   </div>
 </template>
@@ -24,6 +27,9 @@ import TreeView from './TreeView';
 import Editor from './Editor';
 import Resultset from './Resultset';
 import Grid from './LeGrid/Grid';
+import Tabs from './Tabs';
+
+var nifty = require('../nifty');
 
 export default {
     name: 'main-page',
@@ -61,12 +67,22 @@ export default {
         };
     },
     mounted: function() {
+        var dis = this;
+        nifty.commands.listen('execute-query', function() {
+
+        });
+        nifty.commands.listen('new', function() {
+            dis.$store.state.tabs.push({
+                name: 'Untitled'
+            });
+        });
     },
     components: {
         editor: Editor,
         treeView: TreeView,
         resultset: Resultset,
-        grid: Grid
+        grid: Grid,
+        tabs: Tabs
     },
     methods: {
         fill: function() {
@@ -134,6 +150,9 @@ export default {
     display: flex;
     flex-flow: column;
     height: 100%;
+}
+.tabs {
+    height: 40px;
 }
 .first {
     position: relative;

@@ -7,6 +7,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-      filename: '~/git/privat/hej.sql'
+      filename: '~/git/privat/hej.sql',
+      tabs: [
+          { name: 'wtf', active: true }
+      ]
   }
 })

@@ -40,7 +40,10 @@ export default {
     mounted: function() {
         var vs = this.getViewPortSize();
         var subtract = 0;
-        nifty.onCommand('execute-query', () => {
+        var dis = this;
+        nifty.commands.listen('execute-query', () => {
+            console.log('YAY execute-query');
+            dis.$store.state.filename = 'men LOOL';
         });
         if (this.debug) {
             this.$refs.status.style.height = this.px(this.status_height);
