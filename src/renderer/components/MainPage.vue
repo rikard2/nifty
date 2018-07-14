@@ -8,31 +8,69 @@
                 <editor></editor>
             </div>
             <div class="second">
-                second
+                <grid v-model="data"></grid>
             </div>
         </div>
     </div>
   </div>
-  <div class="bottom">{{ filename }}</div>
+  <div class="bottom">
+    <div class="filename">{{ filename }}</div>
+  </div>
   </div>
 </template>
 
 <script>
 import TreeView from './TreeView';
 import Editor from './Editor';
+import Resultset from './Resultset';
+import Grid from './LeGrid/Grid';
 
 export default {
     name: 'main-page',
     data() {
         return {
-            filename: '/var/log/hej.sql'
+            filename: this.$store.state.filename,
+            data: {
+                columns: [
+                    {
+                        label: 'Nr',
+                        width: 60
+                    },
+                    {
+                        label: 'First Name',
+                        width: 200
+                    },
+                    {
+                        label: 'Last Name',
+                        width: 200
+                    },
+                    {
+                        label: 'Mark zuckerberg is a bitch',
+                        width: 200
+                    },
+                    {
+                        label: 'Weeeeeeeeeoooo',
+                        width: 200
+                    }
+                ],
+                rows:
+                    Array.apply(null, {length: 5}).map(Number.call, Number).map(i => {
+                        return [i, 'Jeff Brown', 'Tomte', 'asddasdsa iadsjdklsaj adsljk ads', 'asdlhdaslk asdlk daslkjadsk ljadsk alsd']
+                    })
+            }
         };
+    },
+    mounted: function() {
     },
     components: {
         editor: Editor,
-        treeView: TreeView
+        treeView: TreeView,
+        resultset: Resultset,
+        grid: Grid
     },
     methods: {
+        fill: function() {
+        }
     }
 }
 </script>
@@ -57,6 +95,12 @@ export default {
 .bottom {
     display: flex;
     height: 25px;
+    font-size: 14px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 2px;
+}
+.filename {
+    margin-left: 5px;
 }
 .wrapper {
   display: flex;
@@ -79,13 +123,12 @@ export default {
     border-bottom: 1px solid #e0e0e0;
 }
 .treeview {
-    width: 200px;
+    width: 275px;
     background: #f4f4f4;
     border-right: 1px solid #e0e0e0;
 }
 .editor {
     flex: 3 auto;
-    background: red;
 }
 .middle {
     display: flex;
@@ -98,7 +141,6 @@ export default {
     background: blue;
 }
 .second {
-    height: 150px;
-    background: yellow;
+    height: 250px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div class="editor">
-        <ace-editor v-model="editor_content" @init="editorInit" lang="sql" theme="chrome" class="ace"></ace-editor>
+        <ace-editor v-model="editor_content" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
     </div>
 </template>
 
@@ -22,12 +22,15 @@ export default {
             require('brace/mode/javascript')    //language
             require('brace/mode/less')
             require('brace/theme/chrome')
+            require('./LeGrid/Theme/le.js')
             require('brace/snippets/javascript') //snippet
+            require('brace/mode/sql')
         }
     }
 }
 </script>
-
+<style>
+</style>
 <style scoped>
     .editor {
     }

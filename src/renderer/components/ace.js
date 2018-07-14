@@ -4,7 +4,6 @@ module.exports = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%'
         var width = this.width ? this.px(this.width) : '100%'
-        console.log('a', width, height);
         return h('div',{
             attrs: { style: "position: absolute; /* Added */ top: 0; right: 0; bottom: 0; left: 0;",
             }
@@ -74,13 +73,20 @@ module.exports = {
         require('brace/ext/emmet');
 
         var editor = vm.editor = ace.edit(this.$el);
-
         this.$emit('init',editor);
 
         editor.$blockScrolling = Infinity;
         editor.setOption("enableEmmet", true);
         editor.getSession().setMode('ace/mode/'+lang);
+        editor.setShowPrintMargin(false);
         editor.setTheme('ace/theme/'+theme);
+        editor.setOption("showInvisibles", false);
+        editor.container.style.lineHeight = 1.5
+        editor.renderer.updateFontSize()
+
+        editor.setOption("fontFamily", "Menlo");
+        editor.setOption("fontSize", "14px");
+
         editor.setValue(this.value,1);
         this.contentBackup = this.value;
 

@@ -1,5 +1,5 @@
-import { app, BrowserWindow } from 'electron'
-
+import { app, Menu, BrowserWindow } from 'electron'
+const ipc = require('electron').ipcMain;
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -21,9 +21,37 @@ function createWindow () {
     height: 563,
     useContentSize: true,
     width: 1000
-  })
-
-  mainWindow.loadURL(winURL)
+})
+const template = [
+    {},
+    {
+        label: 'Execute',
+        submenu: [
+            {
+                label: 'Execute Query',
+                accelerator: 'Cmd+X',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'execute-query'
+                    });
+                }
+            }
+        ]
+    },
+    {
+    label: 'Help',
+        submenu: [
+        {
+            label: 'About',
+            click() {
+                electron.shell.openExternal('https://electron.atom.io') }
+            }
+        ]
+    }
+];
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+  mainWindow.loadURL(winURL);
 
   mainWindow.on('closed', () => {
     mainWindow = null

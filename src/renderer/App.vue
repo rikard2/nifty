@@ -5,11 +5,28 @@
 </template>
 
 <script>
-  export default {
+const ipc = require('electron').ipcRenderer
+
+export default {
     name: 'lol',
     components: {
+    },
+    methods: {
+        executeQuery() {
+            console.log('executeQuery');
+        }
+    },
+    created() {
+        var dis = this;
+        ipc.on('command', function(event, msg) {
+            console.log('command', msg);
+            var cmd = msg.command;
+            if (cmd == 'execute-query') {
+                dis.executeQuery();
+            }
+        });
     }
-  }
+}
 </script>
 
 <style>
