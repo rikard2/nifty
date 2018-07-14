@@ -1,5 +1,5 @@
 <template>
-    <div class="editor">
+    <div class="sql-editor">
         <ace-editor v-model="editor_content" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
     </div>
 </template>
@@ -31,7 +31,9 @@ export default {
 </script>
 <style>
 </style>
-<style scoped>
-    .editor {
+<style>
+    .sql-editor {
+        height: 100%;
+        width: 100%;
     }
 </style>
