@@ -1,10 +1,12 @@
 <template>
     <div class="sql-view-flex-container">
         <div class="sql-view-editor">
-            <editor></editor>
+            <editor v-model="value.viewstate.content"></editor>
         </div>
-        <div class="sql-view-resultset">
-            <grid v-model="data"></grid>
+        <div class="sql-view-resultset" :key="value.name">
+            <div v-for="(r, index) in value.viewstate.resultsets">
+                <grid v-model="value.viewstate.resultsets[index]"></grid>
+            </div>
         </div>
     </div>
 </template>
@@ -15,37 +17,10 @@ import Grid from '../LeGrid/Grid';
 
 export default {
     name: 'sqlview',
+    props: ['value'],
     data() {
         return {
-            filename: this.$store.state.filename,
-            data: {
-                columns: [
-                    {
-                        label: 'Nr',
-                        width: 60
-                    },
-                    {
-                        label: 'First Name',
-                        width: 200
-                    },
-                    {
-                        label: 'Last Name',
-                        width: 200
-                    },
-                    {
-                        label: 'Mark zuckerberg is a bitch',
-                        width: 200
-                    },
-                    {
-                        label: 'Weeeeeeeeeoooo',
-                        width: 200
-                    }
-                ],
-                rows:
-                    Array.apply(null, {length: 10}).map(Number.call, Number).map(i => {
-                        return [i, 'Jeff Brown', 'Tomte', 'asddasdsa iadsjdklsaj adsljk ads', 'asdlhdaslk asdlk daslkjadsk ljadsk alsd']
-                    })
-            }
+            filename: this.$store.state.filename
         };
     },
     components: {
@@ -58,6 +33,10 @@ export default {
 </script>
 
 <style>
+.fill {
+    height: 100%;
+    width: 100%;
+}
 .sql-view-flex-container {
     height: 100%;
     width: 100%;
@@ -66,9 +45,11 @@ export default {
 }
 .sql-view-editor {
     flex: 1 auto;
+    overflow-y: scroll;
     position: relative;
 }
 .sql-view-resultset {
-    height: 150px;
+    height: 250px;
+    overflow-y: scroll;
 }
 </style>

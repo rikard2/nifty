@@ -1,12 +1,13 @@
 <template>
     <div class="sql-editor">
-        <ace-editor v-model="editor_content" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
+        <ace-editor v-model="value" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
     </div>
 </template>
 
 <script>
 export default {
     name: 'editor',
+    props: ['value'],
     components: {
         aceEditor: require('./ace.js')
     },

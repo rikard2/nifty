@@ -1,12 +1,12 @@
 <template>
-    <div class="tree-view">
-        
+    <div class="settings-view">
+        settings
     </div>
 </template>
 
 <script>
 export default {
-    name: 'tree-view',
+    name: 'settingsview',
     components: {
     },
     methods: {
@@ -14,8 +14,8 @@ export default {
 }
 </script>
 
-<style scoped>
-    .tree-view {
+<style>
+    .settings-view {
         width: 100%;
         height: 100%;
     }

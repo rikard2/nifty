@@ -14,8 +14,15 @@ export default {
     name: 'tabs',
     components: {
     },
+    mounted: function() {
+        if (this.$store.state.tabs.length > 0) {
+            var firstTab = this.$store.state.tabs[0];
+            this.selectTab(firstTab);
+        }
+    },
     methods: {
         selectTab(tab) {
+            Vue.set(this.$store.state, 'activeTab', tab);
             this.$store.state.tabs.forEach(x => { Vue.set(x, 'active', false) });
             Vue.set(tab, 'active', true);
         }
@@ -34,6 +41,7 @@ export default {
     }
     .tabs-component ul li {
         float: left;
+        cursor: pointer;
         padding-left: 10px;
         padding-right: 10px;
         height: 35px;

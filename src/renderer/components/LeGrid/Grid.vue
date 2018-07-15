@@ -24,6 +24,8 @@ export default {
             show_row_number: true,
             status_height: 25,
             scroll_timer: -1,
+
+            container_max_height: 250,
             column_height: 23,
             column_padding_top: 4,
             column_padding_left: 5,
@@ -38,9 +40,14 @@ export default {
     created: function() {},
     update: function() {},
     mounted: function() {
+        console.log('Grid mounted');
         var vs = this.getViewPortSize();
         var subtract = 0;
         var dis = this;
+        var containerHeight = this.value.rows.length * this.row_height + this.column_height + 10;
+        if (containerHeight > this.container_max_height) containerHeight = this.container_max_height;
+        this.$refs.container.style.height = this.px(containerHeight);
+
         nifty.commands.listen('execute-query', () => {
             console.log('YAY execute-query');
             dis.$store.state.filename = 'men LOOL';
@@ -94,6 +101,7 @@ export default {
             this.render(range);
         },
         onScroll(s) {
+            console.log('scroll');
             this.$refs.columns.childNodes[0].style.left = this.px(this.$refs.viewport.scrollLeft * -1);
             this.status(this.$refs.viewport.scrollLeft);
             if (this.scroll_timer != -1) clearTimeout(this.scroll_timer);
@@ -280,7 +288,7 @@ export default {
     }
     .container {
         width: 100%;
-        height: 100%;
+        height: 175px;
         padding: 0;
         /*border: 1px solid green;*/
     }

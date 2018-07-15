@@ -1,18 +1,27 @@
 <template>
 <div class="around">
+    <div class="tool-bar">
+        <div class="filename">{{ $store.state.filename }}</div>
+    </div>
     <div class="main-wrapper">
         <div class="left-side">
+            <tree-view></tree-view>
         </div>
         <div class="main-side">
             <div class="main-tabs">
                 <tabs></tabs>
             </div>
-            <div class="main-tab-view">
-                <sqlview></sqlview>
+            <div class="main-tab-view" :key="$store.state.activeTab.name">
+                <div v-if="$store.state.activeTab.type == 'sql'" class="fill">
+                    <sqlview v-model="$store.state.activeTab"></sqlview>
+                </div>
+                <div v-if="$store.state.activeTab.type == 'settings'" class="fill">
+                    <settingsview></settingsview>
+                </div>
             </div>
         </div>
     </div>
-    <div class="bottom">
+    <div class="status-bar">
         <div class="filename">{{ $store.state.filename }}</div>
     </div>
 </div>
@@ -24,6 +33,7 @@ import Resultset from './Resultset';
 import Grid from './LeGrid/Grid';
 import Editor from './Editor';
 import SqlView from './TabViews/SqlView';
+import SettingsView from './TabViews/SettingsView';
 import Tabs from './Tabs';
 
 var nifty = require('../nifty');
@@ -37,13 +47,15 @@ export default {
         });
         nifty.commands.listen('new', function() {
             dis.$store.state.tabs.push({
-                name: 'Untitled'
+                name: 'Untitled',
+                type: 'settings'
             });
         });
     },
     components: {
         editor: Editor,
         sqlview: SqlView,
+        settingsview: SettingsView,
         treeView: TreeView,
         resultset: Resultset,
         grid: Grid,
@@ -67,6 +79,7 @@ export default {
   html { height: 100%;}
   body { font-family: 'Source Sans Pro', sans-serif; height: 100%; }
 
+.fill { width: 100%; height: 100%; }
 .around {
     width: 100%;
     height: 100%;
@@ -113,5 +126,19 @@ export default {
 }
 .filename {
     margin-left: 5px;
+}
+.tool-bar {
+    font-family: 'system-ui';
+    font-size: 12px;
+    height: 36px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-top: 3px;
+}
+.status-bar {
+    font-family: 'system-ui';
+    font-size: 12px;
+    height: 24px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 3px;
 }
 </style>
