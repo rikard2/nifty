@@ -3,7 +3,6 @@ const ipc = require('electron').ipcRenderer
 var commands = {
     listeners: [],
     listen: function(name, callback) {
-        console.log('listen!');
         this.listeners.push({
             name: name,
             callback: callback

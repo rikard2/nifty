@@ -90,6 +90,15 @@ module.exports = {
         editor.setValue(this.value,1);
         this.contentBackup = this.value;
 
+        var fs = require('fs')
+        fs.readFile('/Users/rikard/git/trustly/schema/index.sql', 'utf8', function (err,data) {
+
+          if (err) {
+            return console.log(err);
+          }
+          editor.setValue(data, 1);
+        });
+
         editor.on('change',function () {
             var content = editor.getValue();
             vm.$emit('input',content);

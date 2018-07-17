@@ -4,7 +4,7 @@
         <div class="filename">{{ $store.state.filename }}</div>
     </div>
     <div class="main-wrapper">
-        <div class="left-side">
+        <div class="left-side" style="flex-basis: 375px;" v-resize="{ direction: 'horizontal' }">
             <tree-view></tree-view>
         </div>
         <div class="main-side">
@@ -35,6 +35,7 @@ import Editor from './Editor';
 import SqlView from './TabViews/SqlView';
 import SettingsView from './TabViews/SettingsView';
 import Tabs from './Tabs';
+import ResizeDirective from './ResizeDirective';
 
 var nifty = require('../nifty');
 
@@ -51,6 +52,9 @@ export default {
                 type: 'settings'
             });
         });
+    },
+    directives: {
+        resize: ResizeDirective
     },
     components: {
         editor: Editor,
@@ -95,9 +99,10 @@ export default {
     height: 100%;
 }
 .left-side {
-    width: 275px;
     background: #f4f4f4;
     border-right: 1px solid #e0e0e0;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 .main-side {
     flex: 1 auto;
@@ -112,7 +117,7 @@ export default {
 }
 .main-content {
     position: relative;
-    flex: 1 auto;
+    flex: 2 auto;
     height: 100%;
     border: 1px solid red;
 }
@@ -137,8 +142,9 @@ export default {
 .status-bar {
     font-family: 'system-ui';
     font-size: 12px;
-    height: 24px;
+    height: 28px;
     border-top: 1px solid #e0e0e0;
-    padding-top: 3px;
+    padding-top: 5px;
+    padding-left: 2px;
 }
 </style>

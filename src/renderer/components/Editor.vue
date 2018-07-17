@@ -11,6 +11,8 @@ export default {
     components: {
         aceEditor: require('./ace.js')
     },
+    mounted() {
+    },
     data () {
         return {
             editor_content: 'lool'

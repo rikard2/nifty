@@ -14,6 +14,9 @@ background: #f6f6f6\
 background-color: #FFFFFF;\
 color: #4D4D4C\
 }\
+.ace_scroller.ace_scroll-left {\
+    box-shadow: none;\
+}\
 .ace-tomorrow .ace_cursor {\
 color: #AEAFAD\
 }\

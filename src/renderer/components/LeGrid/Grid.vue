@@ -1,12 +1,13 @@
 <script>
 var nifty = require('../../nifty');
+var elementResizeEvent = require('element-resize-event');
 
 export default {
     name: 'grid',
     props: ['value'],
     template: `
         <div style="width: 100%;height: 100%;">
-            <div class="container" ref="container">
+            <div class="container" ref="container" style="border: 1px solid red">
                 <div class="status" ref="status"></div>
                 <div class="columns" ref="columns">
                     <div class="cols"></div>
@@ -25,7 +26,7 @@ export default {
             status_height: 25,
             scroll_timer: -1,
 
-            container_max_height: 250,
+            container_max_height: 450,
             column_height: 23,
             column_padding_top: 4,
             column_padding_left: 5,
@@ -41,7 +42,12 @@ export default {
     update: function() {},
     mounted: function() {
         console.log('Grid mounted');
+        var dis = this;
+        nifty.commands.listen('resize', () => {
+            this.resize(dis);
+        });
         var vs = this.getViewPortSize();
+
         var subtract = 0;
         var dis = this;
         var containerHeight = this.value.rows.length * this.row_height + this.column_height + 10;
@@ -83,6 +89,41 @@ export default {
         this.render();
     },
     methods: {
+        resize(dis) {
+            var subtract = 0;
+            var vs = dis.getViewPortSize();
+            var containerHeight = dis.value.rows.length * dis.row_height + dis.column_height + 10;
+
+            if (containerHeight > dis.container_max_height) containerHeight = dis.container_max_height;
+            dis.$refs.container.style.height = dis.px(containerHeight);
+
+            if (dis.debug) {
+                dis.$refs.status.style.height = dis.px(dis.status_height);
+                subtract += dis.status_height;
+            } else {
+                dis.$refs.status.style.display = 'none';
+            }
+            var containerSize = dis.getContainerSize();
+
+            var columns = dis.renderColumns();
+            subtract += dis.column_height;
+            dis.$refs.columns.style.height = dis.px(dis.column_height);
+
+
+            dis.$refs.columns.style.width = dis.px(containerSize.width);
+            dis.$refs.viewport.style.height = dis.px(containerSize.height - subtract);
+            dis.$refs.viewport.style.width = '100%';
+
+            dis.$refs.scroll.style.height = dis.total_row_size + 'px';
+            dis.$refs.viewport.addEventListener('scroll', dis.onScroll);
+
+            dis.visible_box.width = vs.width;
+            dis.visible_box.height = vs.height;
+            dis.visible_box.top = 0;
+            dis.visible_box.left = 0;
+            //dis.status(dis.visible_box);
+            dis.render();
+        },
         status(o) {
             var s;
             if (typeof(o) === 'object' || typeof(o) === 'array') {
@@ -132,8 +173,8 @@ export default {
             });
             return width;
         },
-        getViewPortSize() {
-            var rect = this.$refs.viewport.getBoundingClientRect();
+        getViewPortSize(dis) {
+            var rect = (this || dis).$refs.viewport.getBoundingClientRect();
             return {
                 width: rect.width,
                 height: rect.height
@@ -180,6 +221,7 @@ export default {
             this.$refs.columns.style.height = this.px(this.column_height - 3);
             var ci = document.createElement('div');
             ci.style.position = 'absolute';
+            ci.style.width = this.px(this.getTotalWidth());
             var columns = this.getColumns().map(x => {
                 var e = document.createElement('div');
                 var inside = document.createElement('div');
@@ -191,9 +233,9 @@ export default {
                 e.style['font-family'] = 'menlo';
                 e.style['font-size'] = '12px';
                 e.style['text-align'] = 'left';
+                e.style['overflow'] = 'hidden';
                 e.style['border-right'] = '1px solid #dbdbbc';
                 e.style['border-bottom'] = '1px solid #dbdbdb';
-                e.style['font-weight'] = '100';
                 e.style.width = this.px(x.width);
                 e.style.height = this.px(this.column_height);
                 e.appendChild(inside);
