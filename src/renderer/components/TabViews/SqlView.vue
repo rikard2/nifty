@@ -3,9 +3,9 @@
         <div class="sql-view-editor">
             <!-- <editor v-model="value.viewstate.content"></editor> -->
         </div>
-        <div  v-resize="{ direction: 'vertical' }" style="flex-basis: 150px;" class="sql-view-resultset" :key="value.name">
-            <div v-for="(r, index) in value.viewstate.resultsets">
-                <grid v-model="value.viewstate.resultsets[index]"></grid>
+        <div v-resize="{ direction: 'vertical' }" style="flex-basis: 350px;" class="sql-view-resultset" :key="value.name">
+            <div v-if="value.viewstate.resultsets.length > 0" style="width: 100%; height: 100%;">
+                <grid v-model="value.viewstate.resultsets[0]"></grid>
             </div>
         </div>
     </div>

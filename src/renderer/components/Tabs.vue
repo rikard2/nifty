@@ -15,8 +15,8 @@ export default {
     components: {
     },
     mounted: function() {
-        if (this.$store.state.tabs.length > 0) {
-            var firstTab = this.$store.state.tabs[0];
+        if (this.$store.state.tabs.length > 1) {
+            var firstTab = this.$store.state.tabs[1];
             this.selectTab(firstTab);
         }
     },

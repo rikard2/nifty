@@ -41,88 +41,52 @@ export default {
     created: function() {},
     update: function() {},
     mounted: function() {
-        console.log('Grid mounted');
+        console.log('mounted');
         var dis = this;
         nifty.commands.listen('resize', () => {
-            this.resize(dis);
+            this.resize.apply(dis);
         });
-        var vs = this.getViewPortSize();
-
-        var subtract = 0;
-        var dis = this;
-        var containerHeight = this.value.rows.length * this.row_height + this.column_height + 10;
-        if (containerHeight > this.container_max_height) containerHeight = this.container_max_height;
-        this.$refs.container.style.height = this.px(containerHeight);
-
-        nifty.commands.listen('execute-query', () => {
-            console.log('YAY execute-query');
-            dis.$store.state.filename = 'men LOOL';
-        });
-        if (this.debug) {
-            this.$refs.status.style.height = this.px(this.status_height);
-            subtract += this.status_height;
-        } else {
-            this.$refs.status.style.display = 'none';
-        }
-        var containerSize = this.getContainerSize();
-
-        var columns = this.renderColumns();
-        subtract += this.column_height;
-        this.$refs.columns.style.height = this.px(this.column_height);
-
-
-        this.$refs.columns.style.width = this.px(containerSize.width);
-        this.$refs.viewport.style.height = this.px(containerSize.height - subtract);
-        this.$refs.viewport.style.width = '100%';
-
-
-        //this.status(this.$refs.container.offsetWidth);
-        //this.status(this.$refs.viewport.style.height);
-        this.$refs.scroll.style.height = this.total_row_size + 'px';
-        this.$refs.viewport.addEventListener('scroll', this.onScroll);
-
-        this.visible_box.width = vs.width;
-        this.visible_box.height = vs.height;
-        this.visible_box.top = 0;
-        this.visible_box.left = 0;
-        //this.status(this.visible_box);
-        this.render();
+        this.resize.apply(dis);
     },
     methods: {
         resize(dis) {
             var subtract = 0;
-            var vs = dis.getViewPortSize();
-            var containerHeight = dis.value.rows.length * dis.row_height + dis.column_height + 10;
+            var actualHeight = this.$refs.container.offsetHeight;
+            var containerHeight = this.value.rows.length * this.row_height + this.column_height + 10;
+            if (containerHeight > this.container_max_height) containerHeight = this.container_max_height;
+            console.log('containerHeight', actualHeight, containerHeight, this.value);
+            //this.$refs.container.style.height = this.px(containerHeight);
 
-            if (containerHeight > dis.container_max_height) containerHeight = dis.container_max_height;
-            dis.$refs.container.style.height = dis.px(containerHeight);
-
-            if (dis.debug) {
-                dis.$refs.status.style.height = dis.px(dis.status_height);
-                subtract += dis.status_height;
+            nifty.commands.listen('execute-query', () => {
+                dis.$store.state.filename = 'men LOOL';
+            });
+            if (this.debug) {
+                this.$refs.status.style.height = this.px(this.status_height);
+                subtract += this.status_height;
             } else {
-                dis.$refs.status.style.display = 'none';
+                this.$refs.status.style.display = 'none';
             }
-            var containerSize = dis.getContainerSize();
+            var containerSize = this.getContainerSize();
 
-            var columns = dis.renderColumns();
-            subtract += dis.column_height;
-            dis.$refs.columns.style.height = dis.px(dis.column_height);
+            var columns = this.renderColumns();
+            subtract += this.column_height;
+            this.$refs.columns.style.height = this.px(this.column_height);
 
 
-            dis.$refs.columns.style.width = dis.px(containerSize.width);
-            dis.$refs.viewport.style.height = dis.px(containerSize.height - subtract);
-            dis.$refs.viewport.style.width = '100%';
+            this.$refs.columns.style.width = this.px(containerSize.width);
+            this.$refs.viewport.style.height = this.px(containerSize.height - subtract);
+            this.$refs.viewport.style.width = '100%';
+            var vs = this.getViewPortSize();
 
-            dis.$refs.scroll.style.height = dis.total_row_size + 'px';
-            dis.$refs.viewport.addEventListener('scroll', dis.onScroll);
+            this.$refs.scroll.style.height = this.total_row_size + 'px';
+            this.$refs.viewport.addEventListener('scroll', this.onScroll);
 
-            dis.visible_box.width = vs.width;
-            dis.visible_box.height = vs.height;
-            dis.visible_box.top = 0;
-            dis.visible_box.left = 0;
-            //dis.status(dis.visible_box);
-            dis.render();
+            this.visible_box.width = vs.width;
+            this.visible_box.height = vs.height;
+            this.visible_box.top = 0;
+            this.visible_box.left = 0;
+            //this.status(this.visible_box);
+            this.render();
         },
         status(o) {
             var s;
@@ -145,19 +109,27 @@ export default {
             console.log('scroll');
             this.$refs.columns.childNodes[0].style.left = this.px(this.$refs.viewport.scrollLeft * -1);
             this.status(this.$refs.viewport.scrollLeft);
-            if (this.scroll_timer != -1) clearTimeout(this.scroll_timer);
-            this.scroll_timer = setTimeout(this.onScrollOver, 100);
+            this.onScrollOver();
+            //if (this.scroll_timer != -1) clearTimeout(this.scroll_timer);
+            //this.scroll_timer = setTimeout(this.onScrollOver, 100);
         },
         getVisibleRange() {
-            var buffer = 25;
+            var buffer = 2;
+            var arr = [];
+            console.log('visible_box', this.visible_box);
             var first = Math.floor(this.visible_box.top / this.row_height);
             var last = Math.ceil((this.visible_box.top + this.visible_box.height) / this.row_height);
-            first = first - buffer;
-            last = last + buffer;
+            arr = [first, last];
+            arr.push(first - 1);
+            arr.push(last + 1);
+            arr.push(first - 2);
+            arr.push(last + 2);
             if (first < 0) first = 0;
             if (last >= this.value.rows.length) last = this.value.rows.length;
             //this.status([first, last]);
-            return this.range(first, last);
+            //return this.range(first, last);
+            console.log('range', arr);
+            return this.range(first - 2, last + 2);
         },
         getContainerSize() {
             //var rect = this.$refs.container.getBoundingClientRect();
@@ -330,8 +302,9 @@ export default {
     }
     .container {
         width: 100%;
-        height: 175px;
+        height: 100%;
         padding: 0;
+        overflow-y: scroll;
         /*border: 1px solid green;*/
     }
     .viewport {

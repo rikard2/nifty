@@ -73,7 +73,7 @@ export default new Vuex.Store({
                               }
                           ],
                           rows:
-                              Array.apply(null, {length: 50}).map(Number.call, Number).map(i => {
+                              Array.apply(null, {length: 50000}).map(Number.call, Number).map(i => {
                                   return [i, 'Jeff Brown', 'Tomte', 'asddasdsa iadsjdklsaj adsljk ads', 'asdlhdaslk asdlk daslkjadsk ljadsk alsd']
                               })
                       }
@@ -113,7 +113,7 @@ WHERE UserID = 23`,
                               }
                           ],
                           rows:
-                              Array.apply(null, {length: 50}).map(Number.call, Number).map(i => {
+                              Array.apply(null, {length: 50000}).map(Number.call, Number).map(i => {
                                   return [i, 'Jeff Brown', 'Tomte', 'asddasdsa iadsjdklsaj adsljk ads', 'asdlhdaslk asdlk daslkjadsk ljadsk alsd']
                               })
                       }
