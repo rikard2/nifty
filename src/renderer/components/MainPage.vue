@@ -1,10 +1,13 @@
 <template>
 <div class="around">
     <div class="tool-bar">
-        <div class="filename">{{ $store.state.filename }}</div>
+        <toolbar>
+            <toolbar-item icon="icons8-file" size="24"></toolbar-item>
+            <toolbar-item icon="icons8-settings" size="24"></toolbar-item>
+        </toolbar>
     </div>
     <div class="main-wrapper">
-        <div class="left-side" style="flex-basis: 375px;" v-resize="{ direction: 'horizontal' }">
+        <div class="left-side" style="flex-basis: 275px;" v-resize="{ direction: 'horizontal' }">
             <tree-view></tree-view>
         </div>
         <div class="main-side">
@@ -36,6 +39,8 @@ import SqlView from './TabViews/SqlView';
 import SettingsView from './TabViews/SettingsView';
 import Tabs from './Tabs';
 import ResizeDirective from './ResizeDirective';
+import Toolbar from './Toolbar';
+import ToolbarItem from './ToolbarItem';
 
 var nifty = require('../nifty');
 
@@ -63,7 +68,9 @@ export default {
         treeView: TreeView,
         resultset: Resultset,
         grid: Grid,
-        tabs: Tabs
+        tabs: Tabs,
+        toolbar: Toolbar,
+        toolbarItem: ToolbarItem
     },
     methods: {
         fill: function() {
@@ -135,7 +142,6 @@ export default {
 .tool-bar {
     font-family: 'system-ui';
     font-size: 12px;
-    height: 36px;
     border-bottom: 1px solid #e0e0e0;
     padding-top: 3px;
 }

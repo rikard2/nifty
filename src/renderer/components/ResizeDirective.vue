@@ -25,7 +25,7 @@ export default {
             binding.handle.style.background = '#e0e0e0';
             binding.handle.style.cursor = 'col-resize';
         } else {
-            binding.handle.style.top = '-3px';
+            binding.handle.style.top = '0px';
             binding.handle.style.left = '0px';
             binding.handle.style.width = '100%';
             binding.handle.style.height = '3px';

@@ -7,7 +7,6 @@
 <script>
 export default {
     name: 'editor',
-    props: ['value'],
     components: {
         aceEditor: require('./ace.js')
     },
@@ -15,7 +14,8 @@ export default {
     },
     data () {
         return {
-            editor_content: 'lool'
+            editor_content: 'lool',
+            value: ''
         }
     },
     methods: {
@@ -36,6 +36,7 @@ export default {
 </style>
 <style>
     .sql-editor {
+        position: relative;
         height: 100%;
         width: 100%;
     }

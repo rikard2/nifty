@@ -7,7 +7,7 @@ export default {
     props: ['value'],
     template: `
         <div style="width: 100%;height: 100%;">
-            <div class="container" ref="container" style="border: 1px solid red">
+            <div class="container" ref="container">
                 <div class="status" ref="status"></div>
                 <div class="columns" ref="columns">
                     <div class="cols"></div>

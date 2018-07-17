@@ -1,9 +1,17 @@
 <template>
     <div class="sql-view-flex-container">
         <div class="sql-view-editor">
-            <!-- <editor v-model="value.viewstate.content"></editor> -->
+            <div style="">
+                <toolbar>
+                    <toolbar-item icon="icons8-play_filled" size="24"></toolbar-item>
+                    <toolbar-item icon="icons8-stop_filled" size="24"></toolbar-item>
+                </toolbar>
+            </div>
+            <div style="flex: 1 auto;width: 100%;height: 100%;">
+                <editor v-model="value.viewstate.content"></editor>
+            </div>
         </div>
-        <div v-resize="{ direction: 'vertical' }" style="flex-basis: 350px;" class="sql-view-resultset" :key="value.name">
+        <div v-resize="{ direction: 'vertical' }" style="flex-basis: 250px;" class="sql-view-resultset" :key="value.name">
             <div v-if="value.viewstate.resultsets.length > 0" style="width: 100%; height: 100%;">
                 <grid v-model="value.viewstate.resultsets[0]"></grid>
             </div>
@@ -16,6 +24,8 @@ import Editor from '../Editor';
 import Grid from '../LeGrid/Grid';
 import ResizeDirective from '../ResizeDirective';
 import BlazingGrid from '../BlazingGrid';
+import Toolbar from '../Toolbar';
+import ToolbarItem from '../ToolbarItem';
 
 export default {
     name: 'sqlview',
@@ -31,6 +41,8 @@ export default {
     components: {
         editor: Editor,
         grid: Grid,
+        toolbar: Toolbar,
+        toolbarItem: ToolbarItem,
         blazingGrid: BlazingGrid
     },
     methods: {
@@ -50,9 +62,13 @@ export default {
     display: flex;
 }
 .sql-view-editor {
+    display: flex;
+    flex-direction: column;
     flex: 1 auto;
     overflow-y: scroll;
     position: relative;
+    width: 100%;
+    height: 100%;
 }
 .sql-view-resultset::-webkit-scrollbar {
     display: none;
