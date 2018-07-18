@@ -54,8 +54,6 @@ export default {
             var actualHeight = this.$refs.container.offsetHeight;
             var containerHeight = this.value.rows.length * this.row_height + this.column_height + 10;
             if (containerHeight > this.container_max_height) containerHeight = this.container_max_height;
-            console.log('containerHeight', actualHeight, containerHeight, this.value);
-            //this.$refs.container.style.height = this.px(containerHeight);
 
             nifty.commands.listen('execute-query', () => {
                 dis.$store.state.filename = 'men LOOL';
@@ -106,7 +104,6 @@ export default {
             this.render(range);
         },
         onScroll(s) {
-            console.log('scroll');
             this.$refs.columns.childNodes[0].style.left = this.px(this.$refs.viewport.scrollLeft * -1);
             this.status(this.$refs.viewport.scrollLeft);
             this.onScrollOver();
@@ -116,7 +113,6 @@ export default {
         getVisibleRange() {
             var buffer = 2;
             var arr = [];
-            console.log('visible_box', this.visible_box);
             var first = Math.floor(this.visible_box.top / this.row_height);
             var last = Math.ceil((this.visible_box.top + this.visible_box.height) / this.row_height);
             arr = [first, last];
@@ -128,7 +124,6 @@ export default {
             if (last >= this.value.rows.length) last = this.value.rows.length;
             //this.status([first, last]);
             //return this.range(first, last);
-            console.log('range', arr);
             return this.range(first - 2, last + 2);
         },
         getContainerSize() {
