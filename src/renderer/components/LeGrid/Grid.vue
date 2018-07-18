@@ -28,7 +28,7 @@ export default {
 
             container_max_height: 450,
             column_height: 23,
-            column_padding_top: 4,
+            column_padding_top: 5,
             column_padding_left: 5,
 
             row_height: 23,
@@ -41,7 +41,6 @@ export default {
     created: function() {},
     update: function() {},
     mounted: function() {
-        console.log('mounted');
         var dis = this;
         nifty.commands.listen('resize', () => {
             this.resize.apply(dis);
@@ -173,36 +172,45 @@ export default {
         },
         getColumns() {
             if (this.show_row_number) {
-                return [ { label: '', width: 40, class: 'grid-column-cell grid-column-cell-row-number', show_border: false } ].concat(this.value.columns);
+                return [ { index: -1, label: '', width: 40, class: 'grid-column-cell grid-column-cell-row-number', show_border: false } ].concat(this.value.columns.map((x, y) => { x.index = y; return x; }));
             } else {
-                return this.value.columns;
+                return this.value.columns.map((x, y) => { x.index = y; return x; });
             }
         },
         renderColumns() {
             this.$refs.columns.innerHTML = '';
             this.$refs.columns.style.position = 'relative';
-            this.$refs.columns.style['border-bottom'] = '1px solid #e0e0e0';
-            this.$refs.columns.style['border-top'] = '1px solid #e0e0e0';
+            //this.$refs.columns.style['margin-bottom'] = '5px';
+            this.$refs.columns.style['border-bottom'] = '1px solid #f3f3f3';
+            this.$refs.columns.style['border-top'] = '1px solid #f0f0f0';
             this.$refs.columns.style.overflow = 'hidden';
             this.$refs.columns.style.background = '#fafafa';
             this.$refs.columns.style.height = this.px(this.column_height - 3);
             var ci = document.createElement('div');
             ci.style.position = 'absolute';
             ci.style.width = this.px(this.getTotalWidth());
-            var columns = this.getColumns().map(x => {
+            var columns = this.getColumns().map((x, ix) => {
                 var e = document.createElement('div');
                 var inside = document.createElement('div');
                 inside.innerText = x.label;
                 inside.style['padding-left'] = this.px(this.column_padding_left);
                 inside.style['padding-top'] = this.px(this.column_padding_top);
 
+                e.style.position = 'relative';
+
+                if (x.index >= 0) {
+                    var handle = this.createResizeHandle(x, ix);
+                    e.appendChild(handle);
+                }
+
                 e.style.float = 'left';
-                e.style['font-family'] = 'menlo';
+                e.style['font-family'] = 'helvetica';
+                e.style['font-weight'] = 'normal';
                 e.style['font-size'] = '12px';
                 e.style['text-align'] = 'left';
                 e.style['overflow'] = 'hidden';
-                e.style['border-right'] = '1px solid #dbdbbc';
-                e.style['border-bottom'] = '1px solid #dbdbdb';
+                e.style['border-right'] = '1px solid #f0f0f0';
+                e.style['border-bottom'] = '1px solid #f0f0f0';
                 e.style.width = this.px(x.width);
                 e.style.height = this.px(this.column_height);
                 e.appendChild(inside);
@@ -211,6 +219,46 @@ export default {
                 ci.appendChild(x);
             });
             this.$refs.columns.appendChild(ci);
+        },
+        createResizeHandle(column, index) {
+            var handle = document.createElement('div');
+            handle.className = 'handle';
+            handle.style.position = 'absolute';
+            handle.style.right = '0px';
+            handle.style.top = '0px';
+            handle.style.width = '1px';
+            handle.style.height = '100%';
+
+            var columns = this.getColumns();
+
+            var offsetLeft = null;
+            var initialClientX = null;
+            var initalWidth = null;
+            var mouseDown = function(e) {
+                if (e.buttons == 1) {
+                    console.log('mousedown');
+                    offsetLeft = handle.offsetLeft;
+                    initialClientX = e.clientX;
+                    initalWidth = columns[index].width;
+                    document.onmousemove = mouseMove;
+                }
+            };
+            var br = handle.getBoundingClientRect();
+            var dis = this;
+            var mouseMove = function(e) {
+                var c = columns[index];
+                var change = e.clientX - initialClientX;
+                e.preventDefault();
+                c.width = initalWidth + change;
+
+                if (e.buttons !== 1) {
+                    document.onmousemove = null;
+                }
+                dis.resize();
+            };
+            handle.onmousedown = mouseDown;
+
+            return handle;
         },
         renderRow(r, ix) {
             var column_row_div = document.createElement('div');
@@ -261,8 +309,8 @@ export default {
 .grid-column-cell {
     text-align: left;
     float: left;
-    border-bottom: 1px solid #e0e0e0;
-    border-right: 1px solid #e0e0e0;
+    border-bottom: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
     font-weight: 100;
     font-size: 12px;
     white-space: nowrap;
@@ -281,6 +329,9 @@ export default {
 .grid-column-cell-inside {
     padding-top: 4px;
     padding-left: 5px;
+}
+.handle:hover {
+    cursor: col-resize;
 }
 </style>
 <style scoped>
@@ -304,7 +355,8 @@ export default {
     }
     .viewport {
         overflow: scroll;
-        font-family: menlo;
+        font-family: helvetica;
+        font-weight: normal;
         font-size: 12px;
     }
     .scroll {

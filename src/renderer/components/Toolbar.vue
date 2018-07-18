@@ -14,7 +14,6 @@ export default {
         toolbarItem: ToolbarItem
     },
     mounted() {
-        console.log('mounted', this);
     },
     methods: {
     }

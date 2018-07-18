@@ -12,9 +12,10 @@
             </div>
         </div>
         <div v-resize="{ direction: 'vertical' }" style="flex-basis: 250px;" class="sql-view-resultset" :key="value.name">
-            <div v-if="value.viewstate.resultsets.length > 0" style="width: 100%; height: 100%;">
+            <!--<div v-if="value.viewstate.resultsets.length > 0" style="width: 100%; height: 100%;">
                 <grid v-model="value.viewstate.resultsets[0]"></grid>
-            </div>
+            </div>-->
+            <data-table></data-table>
         </div>
     </div>
 </template>
@@ -25,6 +26,7 @@ import Grid from '../LeGrid/Grid';
 import ResizeDirective from '../ResizeDirective';
 import BlazingGrid from '../BlazingGrid';
 import Toolbar from '../Toolbar';
+import DataTable from '../DataTable';
 import ToolbarItem from '../ToolbarItem';
 
 export default {
@@ -41,6 +43,7 @@ export default {
     components: {
         editor: Editor,
         grid: Grid,
+        dataTable: DataTable,
         toolbar: Toolbar,
         toolbarItem: ToolbarItem,
         blazingGrid: BlazingGrid
