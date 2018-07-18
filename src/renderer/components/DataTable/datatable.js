@@ -63,7 +63,7 @@ export class DataTable {
 
         holders.numbers_inner = document.createElement('div')
         //holders.numbers_inner.style.width = holders.numbers_inner.style.height = '100%';
-        holders.numbers_inner.style.position = 'absolute';
+        holders.numbers_inner.style.position = 'relative';
         holders.numbers_inner.style.width = '100%';
         holders.numbers_inner.style.top = holders.numbers_inner.style.left = '0px';
 
@@ -80,6 +80,7 @@ export class DataTable {
         holders.viewport_content = document.createElement('div')
         holders.viewport_content.style.height = '5000px';
         holders.viewport_content.style.width = '2000px';
+        holders.viewport_content.style.position = 'relative';
 
         holders.viewport.appendChild(holders.viewport_content);
 
@@ -108,11 +109,13 @@ export class DataTable {
         this.holders.columns_inner.style.left = this.helper.px(this.holders.viewport.scrollLeft * -1);
         this.holders.numbers_inner.style.top = this.helper.px(this.holders.viewport.scrollTop * -1);
         //this.$refs.columns.childNodes[0].style.left = this.px(this.$refs.viewport.scrollLeft * -1);
+        this.renderVisible();
     }
 
     renderNumber(rowIndex) {
         var rowContainer = document.createElement('div');
         rowContainer.style.top     = (rowIndex * this.config.row.height) + 'px';
+        rowContainer.style.position = 'absolute';
         rowContainer.style.height  = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
 
@@ -129,13 +132,58 @@ export class DataTable {
         rowContainer.appendChild(inside_div);
 
         this.holders.numbers_inner.appendChild(rowContainer);
+        return rowContainer;
     }
+
+    getVisibleRange() {
+        var visibleBox = {};
+        visibleBox.top = 0;
+        visibleBox.width = this.holders.viewport.clientWidth;
+
+        return visibleBox;
+    }
+
+    renderVisible() {
+        var visbleBox = {
+            top: this.holders.viewport.scrollTop,
+            left: this.holders.viewport.scrollLeft,
+            width: this.holders.viewport.clientWidth,
+            height: this.holders.viewport.clientHeight
+        };
+        var buffer = 10;
+        var first = Math.floor(visbleBox.top / this.config.row.height) - 5;
+        var last = Math.ceil((visbleBox.top + visbleBox.height) / this.config.row.height) + 5;
+        if (first < 0) first = 0;
+        if (last >= this.data.rows.length) last = this.data.rows.length;
+
+        this.rowCache = this.rowCache || {};
+        this.numbersCache = this.numbersCache || {};
+
+        var range = this.helper.range(first, last);
+        for (var x in this.rowCache) {
+            if (x < first || x > last) {
+                this.holders.viewport_content.removeChild(this.rowCache[x]);
+                this.holders.numbers_inner.removeChild(this.numbersCache[x]);
+                delete this.rowCache[x];
+                delete this.numbersCache[x];
+            }
+        }
+        range.forEach(n => {
+            if (!this.rowCache[n]) {
+                var nel = this.renderNumber(n);
+                this.numbersCache[n] = nel;
+                var el = this.renderRow(this.data.rows[n], n);
+                this.rowCache[n] = el;
+            }
+        });
+    }
+
     renderRow(row, rowIndex) {
         var rowContainer = document.createElement('div');
-        rowContainer.className     = 'grid-column';
         rowContainer.style.top     = (rowIndex * this.config.row.height) + 'px';
         rowContainer.style.height  = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
+        rowContainer.style['position'] = 'absolute';
         //this.status(this.getTotalWidth());
         rowContainer.style.width   = this.helper.px(2000);
         rowContainer.style.height  = this.config.row.height + 'px';
@@ -171,6 +219,7 @@ export class DataTable {
         rowContainer.appendChild(clear);
 
         this.holders.viewport_content.appendChild(rowContainer);
+        return rowContainer;
     }
 
     createColumn(c) {
@@ -195,9 +244,6 @@ export class DataTable {
         this.renderColumns();
         this.holders.numbers_inner.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
         this.holders.viewport_content.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
-        this.data.rows.forEach((row, rowIndex) => {
-            this.renderNumber(rowIndex);
-            this.renderRow(row, rowIndex);
-        })
+        this.renderVisible();
     }
 }
