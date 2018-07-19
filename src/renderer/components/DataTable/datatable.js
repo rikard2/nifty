@@ -13,32 +13,29 @@ export class DataTable {
             dis.selection.onKeyDown.apply(dis.selection, [e]);
         }, false);
         this.selection.onSelectedRangesChanged = function(ranges) {
-            console.log('onSelectedRangesChanged', ranges);
             dis.invalidate(ranges);
             dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
         }
         this.selection.onCellActive = function(x, y) {
-            console.log('onCellActive', x, y);
             dis.onCellActive(x, y);
         }
     }
 
     onCellActive(x, y) {
         var w = 0;
-        for (var i = 0; i < x; i++) {
+        for (var i = 0; i < x + 1; i++) {
             w += this.getColumn(i).width;
         }
         var h = (y + 1) * this.config.row.height;
-        console.log('columns', x, y, this.columns);
-        console.log('w', this.holders.viewport.clientWidth, w);
-        if (w >= (this.holders.viewport.clientWidth - this.getColumn(x).width)) {
-            this.holders.viewport.scrollLeft = w;
+        if (w >= (this.holders.viewport.clientWidth + this.holders.viewport.scrollLeft)) {
+            //console.log('WHY?', w, this.holders.viewport.clientWidth, this.holders.viewport.scrollLeft);
+            this.holders.viewport.scrollLeft = w - this.holders.viewport.clientWidth;
         }
         if (h >= (this.holders.viewport.clientHeight + this.holders.viewport.scrollTop)) {
             this.holders.viewport.scrollTop = h - this.holders.viewport.clientHeight;
         }
         h -= this.config.row.height;
-        console.log('h', x, y, h, this.holders.viewport.scrollTop);
+
         if (h <= (this.holders.viewport.scrollTop)) {
             this.holders.viewport.scrollTop = h;
         }

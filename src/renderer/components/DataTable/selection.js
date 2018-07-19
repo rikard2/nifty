@@ -90,10 +90,11 @@ export class SelectionManager {
             if (newY <= 0) newY = 0;
             if (newX >= this.columns) newX = this.columns - 1;
             if (newY >= this.rows) newY = this.rows - 1;
-            if (e.shiftKey) {
+            if (e.shiftKey && !e.metaKey) {
+                console.log('SHIFT!');
                 this.increaseRange(newX, newY);
                 this.lastCell = { x: newX, y: newY };
-            } else if (this.lastCell && !e.metaKey) {
+            } else if (this.lastCell && (!e.metaKey && !e.shiftKey)) {
                 this.ranges = [];
                 this.activeRange = { minX: newX,
                                      maxX: newX,
@@ -120,6 +121,7 @@ export class SelectionManager {
                     this.increaseRange(newX, newY);
                     this.lastCell = { x: newX, y: newY };
                 } else {
+                    console.log('NONE');
                     this.ranges = [];
                     this.activeRange = { minX: newX,
                                          maxX: newX,
