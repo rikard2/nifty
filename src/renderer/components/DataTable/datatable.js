@@ -1,15 +1,71 @@
 export class DataTable {
     config = require('./config.js').default
     helper = require('./helper.js').default
+    selection = new (require('./selection.js').SelectionManager)();
 
     constructor(rootElement) {
         this.rootElement = rootElement;
         this.holders = this.createHolders()
         this.rootElement.append(this.holders.outerContainer);
+        var dis = this;
+        document.addEventListener("keydown", function(e) {
+            //dis.onKeyDown.apply(dis, [e]);
+            dis.selection.onKeyDown.apply(dis.selection, [e]);
+        }, false);
+        this.selection.onSelectedRangesChanged = function(ranges) {
+            console.log('onSelectedRangesChanged', ranges);
+            dis.invalidate(ranges);
+            dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
+        }
+        this.selection.onCellActive = function(x, y) {
+            console.log('onCellActive', x, y);
+            dis.onCellActive(x, y);
+        }
+    }
+
+    onCellActive(x, y) {
+        var w = 0;
+        for (var i = 0; i < x; i++) {
+            w += this.getColumn(i).width;
+        }
+        var h = (y + 1) * this.config.row.height;
+        console.log('columns', x, y, this.columns);
+        console.log('w', this.holders.viewport.clientWidth, w);
+        if (w >= (this.holders.viewport.clientWidth - this.getColumn(x).width)) {
+            this.holders.viewport.scrollLeft = w;
+        }
+        if (h >= (this.holders.viewport.clientHeight + this.holders.viewport.scrollTop)) {
+            this.holders.viewport.scrollTop = h - this.holders.viewport.clientHeight;
+        }
+        h -= this.config.row.height;
+        console.log('h', x, y, h, this.holders.viewport.scrollTop);
+        if (h <= (this.holders.viewport.scrollTop)) {
+            this.holders.viewport.scrollTop = h;
+        }
+        //this.holders.viewport.scrollTop = w;
+        //this.holders.viewport_content.style.left = '-50px';
+    }
+
+    onKeyDown(e) {
+        //console.log('keydown', e);
+    }
+    onMouseEnter(e) {
+        console.log('mouseenter');
     }
 
     setData(data) {
         this.data = data;
+        console.log(this.data);
+        this.selection.columns = this.data.columns.length;
+        this.selection.rows = this.data.rows.length;
+    }
+
+    invalidate(selectionRanges) {
+        this.holders.numbers_inner.innerHTML = '';
+        this.holders.viewport_content.innerHTML = '';
+        this.rowCache = {};
+        this.renderVisible(selectionRanges);
+        this.renderColumns();
     }
 
     createHolders() {
@@ -17,6 +73,13 @@ export class DataTable {
         holders.outerContainer = document.createElement('div')
         holders.outerContainer.style.width = holders.outerContainer.style.height = '100%';
         holders.outerContainer.style.padding = '5px';
+        holders.outerContainer.style['user-select'] = 'none';
+
+        var css = '.col-resize:hover { cursor: col-resize; }';
+        var style = document.createElement('style');
+        style.appendChild(document.createTextNode(css));
+        document.getElementsByTagName('head')[0].appendChild(style);
+
 
         holders.innerContainer = document.createElement('div')
         holders.innerContainer.style.display = 'flex';
@@ -35,7 +98,7 @@ export class DataTable {
         holders.columns_inner.style['position'] = 'absolute';
         holders.columns_inner.style['top'] = '0px';
         holders.columns_inner.style['left'] = '0px';
-        holders.columns_inner.style['width'] = '100%';
+        holders.columns_inner.style['width'] = '10000px';
         holders.columns_inner.style['height'] = '100%';
         holders.columns.appendChild(holders.columns_inner);
 
@@ -79,14 +142,13 @@ export class DataTable {
 
         holders.viewport_content = document.createElement('div')
         holders.viewport_content.style.height = '5000px';
-        holders.viewport_content.style.width = '2000px';
         holders.viewport_content.style.position = 'relative';
 
         holders.viewport.appendChild(holders.viewport_content);
 
         var dis = this;
         holders.viewport.onscroll = function(e) {
-            dis.onViewportScroll.apply(dis, e);
+            dis.onViewportScroll.apply(dis);
         };
         holders.belowcolumns.appendChild(holders.viewport);
 
@@ -94,7 +156,9 @@ export class DataTable {
     }
 
     renderColumns() {
-        this.data.columns.forEach(c => {
+        this.holders.columns_inner.innerHTML = '';
+        this.data.columns.forEach((c, i) => {
+            c.index = i;
             var el = this.createColumn(c);
 
             this.holders.columns_inner.appendChild(el);
@@ -105,11 +169,21 @@ export class DataTable {
         return this.data.columns[n];
     }
 
-    onViewportScroll(e) {
-        this.holders.columns_inner.style.left = this.helper.px(this.holders.viewport.scrollLeft * -1);
-        this.holders.numbers_inner.style.top = this.helper.px(this.holders.viewport.scrollTop * -1);
-        //this.$refs.columns.childNodes[0].style.left = this.px(this.$refs.viewport.scrollLeft * -1);
-        this.renderVisible();
+    onViewportScroll() {
+        this.scrolls = this.scrolls || 0;
+        //if (this.scrolls % 5 !== 0) { this.scrolls++; return; };
+        var left = this.helper.px(this.holders.viewport.scrollLeft * -1);
+        var top = this.helper.px(this.holders.viewport.scrollTop * -1);
+
+        this.holders.columns.scrollLeft = this.holders.viewport.scrollLeft;
+        this.holders.numbers.scrollTop = this.holders.viewport.scrollTop;
+
+        if (!this.renderTimer) {
+            this.renderTimer = setTimeout(() => {
+                this.renderVisible();
+                this.renderTimer = null;
+            }, 10);
+        }
     }
 
     renderNumber(rowIndex) {
@@ -118,11 +192,12 @@ export class DataTable {
         rowContainer.style.position = 'absolute';
         rowContainer.style.height  = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
+        rowContainer.style['width'] = '100%';
 
         var inside_div = document.createElement('div');
         inside_div.innerText = rowIndex + 1;
         inside_div.style['text-align'] = 'left';
-        inside_div.style['font-family'] = 'helvetica';
+        inside_div.style['font-family'] = 'menlo';
         inside_div.style['font-weight'] = 'normal';
         inside_div.style['padding-left'] = '6px';
         inside_div.style['padding-top'] = '4px';
@@ -143,14 +218,14 @@ export class DataTable {
         return visibleBox;
     }
 
-    renderVisible() {
+    renderVisible(selectionRanges) {
         var visbleBox = {
             top: this.holders.viewport.scrollTop,
             left: this.holders.viewport.scrollLeft,
             width: this.holders.viewport.clientWidth,
             height: this.holders.viewport.clientHeight
         };
-        var buffer = 10;
+        var buffer = 100;
         var first = Math.floor(visbleBox.top / this.config.row.height) - 5;
         var last = Math.ceil((visbleBox.top + visbleBox.height) / this.config.row.height) + 5;
         if (first < 0) first = 0;
@@ -172,25 +247,83 @@ export class DataTable {
             if (!this.rowCache[n]) {
                 var nel = this.renderNumber(n);
                 this.numbersCache[n] = nel;
-                var el = this.renderRow(this.data.rows[n], n);
+                var el = this.renderRow(this.data.rows[n], n, selectionRanges);
                 this.rowCache[n] = el;
             }
         });
     }
 
-    renderRow(row, rowIndex) {
+    createResizeHandle(index) {
+        var handle = document.createElement('div');
+        handle.className = 'handle';
+        handle.style.position = 'absolute';
+        handle.style.right = '0px';
+        handle.style.top = '0px';
+        handle.style.width = '4px';
+        handle.style.height = '100%';
+        handle.className = 'col-resize';
+
+        var columns = this.data.columns;
+
+        var offsetLeft = null;
+        var initialClientX = null;
+        var initalWidth = null;
+        var dis = this;
+        var mouseDown = function(e) {
+            if (e.buttons == 1) {
+                dis.holders.viewport.onscroll = null;
+                offsetLeft = handle.offsetLeft;
+                initialClientX = e.clientX;
+                initalWidth = columns[index].width;
+                document.onmousemove = mouseMove;
+            }
+        };
+
+        var mouseMove = function(e) {
+            var c = columns[index];
+            var change = e.clientX - initialClientX;
+            e.preventDefault();
+            dis.data.columns[index].width = initalWidth + change;
+
+            if (e.buttons !== 1) {
+                document.onmousemove = null;
+                dis.holders.viewport.onscroll = function(e) {
+                    dis.onViewportScroll.apply(dis);
+                };
+            }
+            dis.renderColumns();
+            dis.rowCache = {};
+            var b = dis.holders.viewport.scrollLeft;
+            dis.holders.viewport_content.innerHTML = '';
+            dis.renderVisible();
+            console.log('b', b);
+            dis.holders.viewport.scrollLeft = b;
+        };
+        handle.onmousedown = mouseDown;
+
+        return handle;
+    }
+
+    renderRow(row, rowIndex, selectionRanges) {
         var rowContainer = document.createElement('div');
         rowContainer.style.top     = (rowIndex * this.config.row.height) + 'px';
         rowContainer.style.height  = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
         rowContainer.style['position'] = 'absolute';
         //this.status(this.getTotalWidth());
-        rowContainer.style.width   = this.helper.px(2000);
+        rowContainer.style.width   = this.helper.px(5000);
         rowContainer.style.height  = this.config.row.height + 'px';
-
+        var dis = this;
         row.map((value, colIndex) => {
             var column = this.getColumn(colIndex);
             var outer_div           = document.createElement('div');
+            outer_div.onmousedown = function(e) {
+                dis.selection.onMouseDown.apply(dis.selection, [colIndex, rowIndex, e]);
+                dis.invalidate();
+            };
+            outer_div.addEventListener("mouseenter", function(e) {
+                dis.selection.onMouseEnter.apply(dis.selection, [colIndex, rowIndex, e]);
+            }, false);
             //outer_div.className     = column.class;
             outer_div.style.top     = (rowIndex * this.config.row.height) + 'px';
             outer_div.style.height  = this.helper.px(this.config.row.height);
@@ -198,15 +331,23 @@ export class DataTable {
             outer_div.style.overflow   = 'hidden';
             outer_div.style['border-right']   = '1px solid #f0f0f0';
             outer_div.style['text-align']   = 'left';
-            outer_div.style.width   = this.helper.px(column.width);
+            var selected = dis.selection.isCellSelected(colIndex, rowIndex, selectionRanges);
+            if (selected) {
+                outer_div.style['background'] = 'rgb(210, 236, 255)';
+            } else {
+                //outer_div.style['border'] = '1px solid #0a8eec';
+            }
+            outer_div.style.width   = this.helper.px(this.data.columns[colIndex].width);
 
             var inside_div = document.createElement('div');
             inside_div.innerText = row[colIndex];
-            inside_div.style['font-family'] = 'helvetica';
+            inside_div.style['font-family'] = 'menlo';
             inside_div.style['font-weight'] = 'normal';
             inside_div.style['padding-left'] = '4px';
             inside_div.style['padding-top'] = '4px';
             inside_div.style['font-size'] = '12px';
+            inside_div.style['overflow'] = 'hidden';
+            inside_div.style['white-space'] = 'nowrap';
 
             outer_div.appendChild(inside_div);
 
@@ -225,11 +366,17 @@ export class DataTable {
     createColumn(c) {
         var div = document.createElement('div');
         var e = document.createElement('div');
+        e.style.position = 'relative';
         var inside = document.createElement('div');
+
+        var handle = this.createResizeHandle(c.index);
+        e.appendChild(handle);
 
         inside.innerText = c.label;
         inside.style['padding-left'] = this.helper.px(this.config.column.padding_left);
         inside.style['padding-top'] = this.helper.px(this.config.column.padding_top);
+        inside.style['overflow'] = 'hidden';
+        inside.style['white-space'] = 'nowrap';
         e.style.position = 'relative';
         e.style.float = 'left';
         this.helper.apply(e.style, this.config.column.cell.style);

@@ -7,5 +7,6 @@ export default {
             obj[key] = properties[key];
         }
     },
+    noop: function() {},
     range: function(offset, n) { return Array.apply(null, {length: (n - offset)}).map(Number.call, Number).map(i => { return i + offset }) }
 }

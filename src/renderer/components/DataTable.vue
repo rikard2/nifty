@@ -3,6 +3,7 @@
 </template>
 
 <script>
+var nifty = require('../nifty');
 export default {
     name: 'dataTable',
     mounted() {
@@ -11,6 +12,9 @@ export default {
         var data = require('./DataTable/data.js').default;
         dt.setData(data.one);
         dt.render();
+        nifty.commands.listen('resize', () => {
+            dt.invalidate();
+        });
     },
     components: {
     },
