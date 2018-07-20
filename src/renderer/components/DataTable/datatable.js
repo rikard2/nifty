@@ -5,8 +5,7 @@ export class DataTable {
 
     constructor(rootElement) {
         this.rootElement = rootElement;
-        this.holders = this.createHolders()
-        this.rootElement.append(this.holders.outerContainer);
+        this.create();
         var dis = this;
         document.addEventListener("keydown", function(e) {
             //dis.onKeyDown.apply(dis, [e]);
@@ -18,6 +17,13 @@ export class DataTable {
                 dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
             }
         }
+    }
+
+    create() {
+        this.rootElement.innerHTML = '';
+        this.holders = this.createHolders()
+        this.rootElement.append(this.holders.outerContainer);
+        var dis = this;
     }
 
     onCellActive(x, y) {
@@ -50,10 +56,12 @@ export class DataTable {
     }
 
     setData(data) {
-
+        this.create();
         this.data = data;
         this.selection.columns = this.data.columns.length;
         this.selection.rows = this.data.rows.length;
+        this.holders.numbers_inner.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
+        this.holders.viewport_content.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
         this.invalidate();
     }
 
@@ -153,7 +161,6 @@ export class DataTable {
         holders.viewport.style.border = '1px solid #f3f3f3';
 
         holders.viewport_content = document.createElement('div')
-        holders.viewport_content.style.height = '5000px';
         holders.viewport_content.style.position = 'relative';
 
         holders.viewport.appendChild(holders.viewport_content);
@@ -189,6 +196,7 @@ export class DataTable {
 
         this.holders.columns.scrollLeft = this.holders.viewport.scrollLeft;
         this.holders.numbers.scrollTop = this.holders.viewport.scrollTop;
+        console.log('scroll', this.holders.viewport.scrollTop);
 
         if (!this.renderTimer) {
             this.renderTimer = setTimeout(() => {

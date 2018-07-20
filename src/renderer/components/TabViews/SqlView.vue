@@ -137,6 +137,7 @@ export default {
     flex-basis: 30px;
 }
 .resultset-tab ul {
+    font-size: 14px;
     list-style: none;
     font-weight: normal;
 }
@@ -145,7 +146,7 @@ export default {
     cursor: pointer;
     padding-left: 10px;
     padding-right: 10px;
-    height: 35px;
+    height: 30px;
     padding-top: 7px;
     border-bottom: 1px solid #e0e0e0;
     border-right: 1px solid #e0e0e0;

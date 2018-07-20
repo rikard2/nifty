@@ -33,7 +33,7 @@ export class Nifty {
                             width: 300
                         }],
                         rows:
-                        Array.apply(null, {length: 59}).map(Number.call, Number).map(i => {
+                        Array.apply(null, {length: 59000}).map(Number.call, Number).map(i => {
                             return [i, 'Jeff Brown']
                         })
                     }

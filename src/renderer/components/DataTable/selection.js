@@ -103,6 +103,7 @@ export class SelectionManager {
                                      maxY: newY };
                 this.lastCell = this.startCell = { x: newX, y: newY };
                 this.onCellActive(newX, newY);
+                console.log('onCellActive', newX, newY);
             } else if (this.lastCell && (e.metaKey || e.shiftKey)) {
                 if (e.keyCode == 37) {
                     newX = 0;

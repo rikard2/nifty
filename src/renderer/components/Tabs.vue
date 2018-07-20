@@ -33,18 +33,19 @@ export default {
 <style scoped>
     .tabs-component {
         background: #f4f4f4;
-        height: 35px;
+        height: 30px;
     }
     .tabs-component ul {
         list-style: none;
         font-weight: normal;
+        font-size: 14px;
     }
     .tabs-component ul li {
         float: left;
         cursor: pointer;
         padding-left: 10px;
         padding-right: 10px;
-        height: 35px;
+        height: 30px;
         padding-top: 7px;
         border-bottom: 1px solid #e0e0e0;
         border-right: 1px solid #e0e0e0;
