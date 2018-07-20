@@ -13,7 +13,8 @@ Vue.config.productionTip = false
 var v = new Vue({
   components: { App },
   beforeMount: function() {
-      this.nifty = new Nifty();
+      this.nifty = new Nifty(this);
+      window.nifty = this.nifty;
   },
   router,
   store,

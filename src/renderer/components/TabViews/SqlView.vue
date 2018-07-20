@@ -11,16 +11,21 @@
                 <editor v-model="value.viewstate.content"></editor>
             </div>
         </div>
-        <div v-resize="{ direction: 'vertical' }" style="flex-basis: 250px;" class="sql-view-resultset" :key="value.name">
-            <!--<div v-if="value.viewstate.resultsets.length > 0" style="width: 100%; height: 100%;">
-                <grid v-model="value.viewstate.resultsets[0]"></grid>
-            </div>-->
-            <data-table></data-table>
+        <div v-if="value.viewstate.result" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
+            <div class="resultset-tab">
+                <ul v-for="(r, i) in value.viewstate.result.resultsets">
+                    <li @click="tabClick(i)">{{ r.label }}</li>
+                </ul>
+            </div>
+            <div style="flex: 1 auto; border: 1px solid blue;position: relative;">
+                <data-table></data-table>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+var nifty = require('../../nifty');
 import Editor from '../Editor';
 import Grid from '../LeGrid/Grid';
 import ResizeDirective from '../ResizeDirective';
@@ -40,6 +45,8 @@ export default {
             filename: this.$store.state.filename
         };
     },
+    mounted() {
+    },
     components: {
         editor: Editor,
         grid: Grid,
@@ -49,6 +56,9 @@ export default {
         blazingGrid: BlazingGrid
     },
     methods: {
+        tabClick: function() {
+            console.log('tabclick');
+        }
     }
 }
 </script>
@@ -80,5 +90,30 @@ export default {
     flex-grow: 0;
     flex-shrink: 0;
     overflow: hidden;
+}
+.resultset-tab {
+    background: #f3f3f3;
+    min-height: 40px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 35px;
+}
+.resultset-tab ul {
+    list-style: none;
+    font-weight: normal;
+}
+.resultset-tab ul li {
+    float: left;
+    cursor: pointer;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 35px;
+    padding-top: 7px;
+    border-bottom: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+}
+.resultset-tab ul li.active {
+    background: #fff;
+    border-bottom: none;
 }
 </style>

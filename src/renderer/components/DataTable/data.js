@@ -31,8 +31,24 @@ export default {
                 }
             ],
             rows:
-                Array.apply(null, {length: 100000}).map(Number.call, Number).map(i => {
+                Array.apply(null, {length: 5}).map(Number.call, Number).map(i => {
                     return [i, 'Jeff Brown', 'Tomte', 'asddasdsa iadsjdklsaj adsljk ads', 'asdlhdaslk asdlk daslkjadsk ljadsk alsd', '23',  'daslkjadsk ljadsk alsd']
                 })
-        }
+        },
+        two: {
+                columns: [
+                    {
+                        label: 'Nr',
+                        width: 60
+                    },
+                    {
+                        label: 'First Name',
+                        width: 200
+                    }
+                ],
+                rows:
+                    Array.apply(null, {length: 100000}).map(Number.call, Number).map(i => {
+                        return [i, 'Jeff Brown']
+                    })
+            }
 }

@@ -99,8 +99,10 @@ module.exports = {
           editor.setValue(data, 1);
         });
 
-        editor.on('change',function () {
+        editor.on('change',function (delta) {
             var content = editor.getValue();
+            vm.$root.nifty.activeEditor = editor;
+            console.log('change!');
             vm.$emit('input',content);
             vm.contentBackup = content;
         });

@@ -11,7 +11,7 @@ export default {
         binding.handle.onmousedown = null;
         binding.handle.onmouseup = null;
     },
-    inserted: function (el, binding) {
+    inserted: function (el, binding, vnode) {
         var direction = binding.value.direction;
 
         el.style.position = 'relative';
@@ -51,6 +51,7 @@ export default {
             document.onmousemove = null;
             hideOverlay();
         };
+        var dis = binding;
         binding.mousemove = function(e) {
             e.preventDefault();
             if (e.buttons == 1) {
@@ -58,12 +59,12 @@ export default {
                     var change = e.clientX - binding.inital_basis;
                     var newWidth = binding.inital_basis + change;
                     el.style['flex-basis'] = newWidth + 'px';
-                    nifty.commands.send('resize');
+                    window.nifty.send('resize');
                 } else if (direction == 'vertical') {
                     var change = binding.initalY - e.clientY;
                     var newHeight = binding.inital_basis + change;
                     el.style['flex-basis'] = newHeight + 'px';
-                    nifty.commands.send('resize');
+                    window.nifty.send('resize');
                 }
             } else {
                 document.onmousemove = null;

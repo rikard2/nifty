@@ -1,14 +1,25 @@
+import Vue from 'vue'
 const ipc = require('electron').ipcRenderer
 
 export class Nifty {
     listeners = [];
     activeEditor = null;
+    vm = null;
 
-    constructor() {
-        console.debug('Load of nifty');
+
+    constructor(vm) {
+        this.vm = vm;
+        console.log('Load of nifty');
+
+        var dis = this;
         ipc.on('command', function(event, msg) {
-            //console.log(commands.listeners);
-            //commands.send(msg.command, msg.payload);
+            dis.send.apply(dis, [ msg.command, msg.payload ]);
+        });
+
+        this.on('execute-query', () => {
+            if (dis.activeEditor) {
+                vm.$store.state.tabs[0].name = 'FUCK YEAH';
+            }
         });
     }
 
@@ -20,9 +31,10 @@ export class Nifty {
     }
 
     send(name, payload) {
+        console.log('SEND', this.$root);
         this.listeners.forEach(l => {
             if (l.name == name) {
-                l.callback(payload);
+                l.callback.apply(this, [ payload ]);
             }
         });
     }

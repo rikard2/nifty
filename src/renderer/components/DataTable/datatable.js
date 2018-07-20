@@ -50,6 +50,7 @@ export class DataTable {
     }
 
     setData(data) {
+
         this.data = data;
         this.selection.columns = this.data.columns.length;
         this.selection.rows = this.data.rows.length;

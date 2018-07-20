@@ -16,11 +16,11 @@
             <div class="main-tabs">
                 <tabs></tabs>
             </div>
-            <div class="main-tab-view" :key="$store.state.activeTab.name">
-                <div v-if="$store.state.activeTab.type == 'sql'" class="fill">
-                    <sqlview index="" v-model="$store.state.activeTab"></sqlview>
+            <div class="main-tab-view" :key="$store.state.tabs[$store.state.activeTab.index].name">
+                <div v-if="$store.state.tabs[$store.state.activeTab.index].type == 'sql'" class="fill">
+                    <sqlview index="" v-model="$store.state.tabs[$store.state.activeTab.index]"></sqlview>
                 </div>
-                <div v-if="$store.state.activeTab.type == 'settings'" class="fill">
+                <div v-if="$store.state.tabs[$store.state.activeTab.index].type == 'settings'" class="fill">
                     <settingsview></settingsview>
                 </div>
             </div>

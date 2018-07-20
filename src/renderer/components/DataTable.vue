@@ -10,7 +10,7 @@ export default {
         var DataTable = require('./DataTable/datatable.js').DataTable;
         var dt = new DataTable(this.$refs.datatable);
         var data = require('./DataTable/data.js').default;
-        dt.setData(data.one);
+        dt.setData(data.two);
         dt.render();
         this.$root.nifty.on('resize', () => {
             dt.invalidate();
@@ -27,5 +27,10 @@ export default {
     .dt {
         width: 100%;
         height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
 </style>
