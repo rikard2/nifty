@@ -14,10 +14,9 @@ export class DataTable {
         }, false);
         this.selection.onSelectedRangesChanged = function(ranges) {
             dis.invalidate(ranges);
-            dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
-        }
-        this.selection.onCellActive = function(x, y) {
-            dis.onCellActive(x, y);
+            if (dis.selection.lastCell) {
+                dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
+            }
         }
     }
 
@@ -52,9 +51,9 @@ export class DataTable {
 
     setData(data) {
         this.data = data;
-        console.log(this.data);
         this.selection.columns = this.data.columns.length;
         this.selection.rows = this.data.rows.length;
+        this.invalidate();
     }
 
     invalidate(selectionRanges) {
@@ -72,7 +71,21 @@ export class DataTable {
         holders.outerContainer.style.padding = '5px';
         holders.outerContainer.style['user-select'] = 'none';
 
-        var css = '.col-resize:hover { cursor: col-resize; }';
+        var css = `.col-resize:hover { cursor: col-resize; }
+        .flashcell {
+            background: #007a99;
+            color: #333333;
+            border: 5px solid #FFF;
+        }
+        .copyFlash {
+            animation: fadeinout 200ms linear forwards;
+        }
+        @keyframes fadeinout {
+          0% { background: #007a99; opacity: 0.7; }
+          100% { opacity: 1;  }
+          50% { opacity: 1; }
+        }
+        `;
         var style = document.createElement('style');
         style.appendChild(document.createTextNode(css));
         document.getElementsByTagName('head')[0].appendChild(style);
@@ -81,6 +94,7 @@ export class DataTable {
         holders.innerContainer = document.createElement('div')
         holders.innerContainer.style.display = 'flex';
         holders.innerContainer.style['flex-direction'] = 'column';
+        holders.innerContainer.style['cursor'] = 'default';
         holders.innerContainer.style.width = holders.innerContainer.style.height = '100%';
         holders.outerContainer.appendChild(holders.innerContainer);
 
@@ -330,6 +344,11 @@ export class DataTable {
             outer_div.style['text-align']   = 'left';
             var selected = dis.selection.isCellSelected(colIndex, rowIndex, selectionRanges);
             if (selected) {
+                if (dis.selection.copy) {
+                    outer_div.className = 'copyFlash';
+                } else {
+                    outer_div.className = '';
+                }
                 outer_div.style['background'] = 'rgb(210, 236, 255)';
             } else {
                 //outer_div.style['border'] = '1px solid #0a8eec';

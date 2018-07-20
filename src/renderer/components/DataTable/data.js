@@ -31,7 +31,7 @@ export default {
                 }
             ],
             rows:
-                Array.apply(null, {length: 30000}).map(Number.call, Number).map(i => {
+                Array.apply(null, {length: 100000}).map(Number.call, Number).map(i => {
                     return [i, 'Jeff Brown', 'Tomte', 'asddasdsa iadsjdklsaj adsljk ads', 'asdlhdaslk asdlk daslkjadsk ljadsk alsd', '23',  'daslkjadsk ljadsk alsd']
                 })
         }

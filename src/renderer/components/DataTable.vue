@@ -12,7 +12,7 @@ export default {
         var data = require('./DataTable/data.js').default;
         dt.setData(data.one);
         dt.render();
-        nifty.commands.listen('resize', () => {
+        this.$root.nifty.on('resize', () => {
             dt.invalidate();
         });
     },

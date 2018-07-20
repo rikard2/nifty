@@ -3,8 +3,10 @@ export class SelectionManager {
     ranges = [];
     lastCell = null;
     startCell = null;
+    copy = false;
     onSelectedRangesChanged = function() {};
     onCellActive = function() {}
+    onCopy = function() {}
 
     constructor() {
     }
@@ -91,7 +93,6 @@ export class SelectionManager {
             if (newX >= this.columns) newX = this.columns - 1;
             if (newY >= this.rows) newY = this.rows - 1;
             if (e.shiftKey && !e.metaKey) {
-                console.log('SHIFT!');
                 this.increaseRange(newX, newY);
                 this.lastCell = { x: newX, y: newY };
             } else if (this.lastCell && (!e.metaKey && !e.shiftKey)) {
@@ -117,11 +118,9 @@ export class SelectionManager {
                     newX = this.lastCell.x;
                 }
                 if (e.shiftKey && e.shiftKey) {
-                    console.log('BOTH');
                     this.increaseRange(newX, newY);
                     this.lastCell = { x: newX, y: newY };
                 } else {
-                    console.log('NONE');
                     this.ranges = [];
                     this.activeRange = { minX: newX,
                                          maxX: newX,
@@ -135,7 +134,13 @@ export class SelectionManager {
             }
 
         }
-        this.onSelectedRangesChanged();
+        if (e.metaKey && e.key == 'c') {
+            this.copy = true;
+            this.onSelectedRangesChanged();
+            this.copy = false;
+        } else {
+            this.onSelectedRangesChanged();
+        }
     }
 
     onMouseUp(x, y) {

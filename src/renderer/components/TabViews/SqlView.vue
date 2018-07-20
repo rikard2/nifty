@@ -3,8 +3,8 @@
         <div class="sql-view-editor">
             <div style="">
                 <toolbar>
-                    <toolbar-item icon="icons8-play_filled" size="24"></toolbar-item>
-                    <toolbar-item icon="icons8-stop_filled" size="24"></toolbar-item>
+                    <toolbar-item icon="play" size="14"></toolbar-item>
+                    <toolbar-item icon="stop" size="12"></toolbar-item>
                 </toolbar>
             </div>
             <div style="flex: 1 auto;width: 100%;height: 100%;">

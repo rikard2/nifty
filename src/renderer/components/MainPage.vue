@@ -1,11 +1,13 @@
 <template>
 <div class="around">
-    <div class="tool-bar">
+<!--
+    <dipv class="tool-bar">
         <toolbar>
-            <toolbar-item icon="icons8-file" size="24"></toolbar-item>
-            <toolbar-item icon="icons8-settings" size="24"></toolbar-item>
+            <toolbar-item icon="file" size="20" top="7"></toolbar-item>
+            <toolbar-item icon="cogwheel" size="20" top="6"></toolbar-item>
         </toolbar>
     </div>
+-->
     <div class="main-wrapper">
         <div class="left-side" style="flex-basis: 275px;" v-resize="{ direction: 'horizontal' }">
             <tree-view></tree-view>
@@ -16,7 +18,7 @@
             </div>
             <div class="main-tab-view" :key="$store.state.activeTab.name">
                 <div v-if="$store.state.activeTab.type == 'sql'" class="fill">
-                    <sqlview v-model="$store.state.activeTab"></sqlview>
+                    <sqlview index="" v-model="$store.state.activeTab"></sqlview>
                 </div>
                 <div v-if="$store.state.activeTab.type == 'settings'" class="fill">
                     <settingsview></settingsview>
@@ -48,10 +50,10 @@ export default {
     name: 'main-page',
     mounted: function() {
         var dis = this;
-        nifty.commands.listen('execute-query', function() {
+        this.$root.nifty.on('execute-query', function() {
 
         });
-        nifty.commands.listen('new', function() {
+        this.$root.nifty.on('new', function() {
             dis.$store.state.tabs.push({
                 name: 'Untitled',
                 type: 'settings'

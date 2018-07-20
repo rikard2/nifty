@@ -11,6 +11,9 @@ export default {
     name: 'lol',
     components: {
     },
+    mounted() {
+        this.nifty = 'LOOOOL';
+    },
     methods: {
         executeQuery() {
             console.log('executeQuery');

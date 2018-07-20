@@ -42,7 +42,7 @@ export default {
     update: function() {},
     mounted: function() {
         var dis = this;
-        nifty.commands.listen('resize', () => {
+        this.$root.nifty.on('resize', () => {
             this.resize.apply(dis);
         });
         this.resize.apply(dis);
@@ -54,7 +54,7 @@ export default {
             var containerHeight = this.value.rows.length * this.row_height + this.column_height + 10;
             if (containerHeight > this.container_max_height) containerHeight = this.container_max_height;
 
-            nifty.commands.listen('execute-query', () => {
+            this.$root.nifty.on('execute-query', () => {
                 dis.$store.state.filename = 'men LOOL';
             });
             if (this.debug) {
