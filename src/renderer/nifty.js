@@ -18,7 +18,26 @@ export class Nifty {
 
         this.on('execute-query', () => {
             if (dis.activeEditor) {
-                vm.$store.state.tabs[0].name = 'FUCK YEAH';
+                //vm.$store.state.tabs[0]
+                console.log('vm.$store.state', vm.$store.state);
+                vm.$store.state.tabs[0].viewstate.result.resultsets.push(
+                    {
+                        label: 'Result #2',
+                        resultset: true,
+                        columns: [{
+                            label: 'Nr',
+                            width: 60
+                        },
+                        {
+                            label: 'Name',
+                            width: 300
+                        }],
+                        rows:
+                        Array.apply(null, {length: 59}).map(Number.call, Number).map(i => {
+                            return [i, 'Jeff Brown']
+                        })
+                    }
+                );
             }
         });
     }

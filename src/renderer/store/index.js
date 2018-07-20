@@ -19,12 +19,18 @@ export default new Vuex.Store({
               viewstate: {
                   result: {
                       loading: true,
+                      selected: 1,
                       resultsets: [
                           {
-                              label: 'Messages'
+                              label: 'Messages',
+                              resultset: false,
+                              messages: [{
+                                  text: 'whatever'
+                              }]
                           },
                           {
                               label: 'Result #',
+                              resultset: true,
                               columns: [{
                                   label: 'Nr',
                                   width: 60
@@ -35,7 +41,7 @@ export default new Vuex.Store({
                               }],
                               rows:
                               Array.apply(null, {length: 5}).map(Number.call, Number).map(i => {
-                                  return [i, 'Jeff Brown', 'Tomte']
+                                  return [i, 'Jeff Brown']
                               })
                           }
                       ]

@@ -6,19 +6,28 @@
 var nifty = require('../nifty');
 export default {
     name: 'dataTable',
+    props: ['value'],
     mounted() {
         var DataTable = require('./DataTable/datatable.js').DataTable;
-        var dt = new DataTable(this.$refs.datatable);
+        this.dt = new DataTable(this.$refs.datatable);
         var data = require('./DataTable/data.js').default;
-        dt.setData(data.two);
-        dt.render();
+        //console.log('MOUNTED', Object.keys(this.$props.value));
+        console.log('MOUNTED', this.$props.value);
+        this.dt.setData(this.$props.value);
         this.$root.nifty.on('resize', () => {
-            dt.invalidate();
+            this.dt.invalidate();
         });
     },
     components: {
     },
     methods: {
+    },
+    watch: {
+        value: function(n, o) {
+            console.log('WATCH', n);
+            this.dt.setData(n);
+            //dt.setData(n);
+        }
     }
 }
 </script>

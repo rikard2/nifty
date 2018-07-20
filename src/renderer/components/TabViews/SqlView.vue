@@ -14,11 +14,19 @@
         <div v-if="value.viewstate.result" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
             <div class="resultset-tab">
                 <ul v-for="(r, i) in value.viewstate.result.resultsets">
-                    <li @click="tabClick(i)">{{ r.label }}</li>
+                    <li @click="tabClick(i)" :class="{ active: i == value.viewstate.result.selected }">{{ r.label }}</li>
                 </ul>
             </div>
-            <div style="flex: 1 auto; border: 1px solid blue;position: relative;">
-                <data-table></data-table>
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
+                <data-table v-model="value.viewstate.result.resultsets[value.viewstate.result.selected]"></data-table>
+            </div>
+            <div style="flex: 1 auto;position: relative;" v-else="value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
+                <div v-for="m in value.viewstate.result.resultsets[value.viewstate.result.selected].messages" class="messages">
+                    <pre class="statusmessage">
+                        <span class="runtime_instant">instant</span>
+                        <span class="message">{{ m.text }}</span>
+                    </pre>
+                </div>
             </div>
         </div>
     </div>
@@ -56,8 +64,8 @@ export default {
         blazingGrid: BlazingGrid
     },
     methods: {
-        tabClick: function() {
-            console.log('tabclick');
+        tabClick: function(i) {
+            this.$props.value.viewstate.result.selected = i;
         }
     }
 }
@@ -73,6 +81,37 @@ export default {
     width: 100%;
     flex-direction: column;
     display: flex;
+}
+.statusmessage {
+    border-top-left-radius: 0px;
+    border-radius: 0px;
+    padding: 0px;
+    vertical-align: middle;
+    margin-bottom: 2px;
+    font-size: 12px;
+    display: flex;
+}
+.runtime_instant {
+    border-right: #1f96ff;
+    background: #ebebeb;
+    color: #fff;
+    letter-spacing: 0px;
+    font-size: 10px;
+    vertical-align: middle;
+    padding-left: 5px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    display: inline-flex;
+    min-width: 58px;
+    margin-right: 5px;
+}
+.message {
+    margin-right: 80px;
+    display: inline-flex;
+    margin-top: 7px;
+}
+.messages {
+    padding: 10px;
 }
 .sql-view-editor {
     display: flex;
@@ -93,10 +132,9 @@ export default {
 }
 .resultset-tab {
     background: #f3f3f3;
-    min-height: 40px;
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: 35px;
+    flex-basis: 30px;
 }
 .resultset-tab ul {
     list-style: none;
