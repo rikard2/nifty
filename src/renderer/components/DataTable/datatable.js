@@ -2,21 +2,28 @@ export class DataTable {
     config = require('./config.js').default
     helper = require('./helper.js').default
     selection = new (require('./selection.js').SelectionManager)();
+    keyDownListener = null;
 
     constructor(rootElement) {
         this.rootElement = rootElement;
         this.create();
         var dis = this;
-        document.addEventListener("keydown", function(e) {
-            //dis.onKeyDown.apply(dis, [e]);
+        this.keyDownListener = function(e) {
             dis.selection.onKeyDown.apply(dis.selection, [e]);
-        }, false);
+        };
+        document.addEventListener("keydown", this.keyDownListener);
         this.selection.onSelectedRangesChanged = function(ranges) {
-            dis.invalidate(ranges);
+            dis.invalidateSoft(ranges);
+
             if (dis.selection.lastCell) {
+                dis.onViewportScroll.apply(dis);
                 dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
             }
         }
+    }
+
+    destroy() {
+        document.removeEventListener("keydown", this.keyDownListener);
     }
 
     create() {
@@ -33,7 +40,6 @@ export class DataTable {
         }
         var h = (y + 1) * this.config.row.height;
         if (w >= (this.holders.viewport.clientWidth + this.holders.viewport.scrollLeft)) {
-            //console.log('WHY?', w, this.holders.viewport.clientWidth, this.holders.viewport.scrollLeft);
             this.holders.viewport.scrollLeft = w - this.holders.viewport.clientWidth;
         }
         if (h >= (this.holders.viewport.clientHeight + this.holders.viewport.scrollTop)) {
@@ -44,15 +50,12 @@ export class DataTable {
         if (h <= (this.holders.viewport.scrollTop)) {
             this.holders.viewport.scrollTop = h;
         }
-        //this.holders.viewport.scrollTop = w;
-        //this.holders.viewport_content.style.left = '-50px';
     }
 
     onKeyDown(e) {
         //console.log('keydown', e);
     }
     onMouseEnter(e) {
-        console.log('mouseenter');
     }
 
     setData(data) {
@@ -63,6 +66,11 @@ export class DataTable {
         this.holders.numbers_inner.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
         this.holders.viewport_content.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
         this.invalidate();
+    }
+
+    invalidateSoft(selectionRanges) {
+        this.renderVisible(selectionRanges);
+        this.renderColumns();
     }
 
     invalidate(selectionRanges) {
@@ -130,7 +138,6 @@ export class DataTable {
         holders.belowcolumns.style['flex-direction'] = 'row';
         holders.belowcolumns.style['margin-top'] = this.helper.px(this.config.numbers.distance)
         holders.belowcolumns.style.height = '100%';
-        //holders.belowcolumns.style.border = '1px solid red';
         holders.innerContainer.appendChild(holders.belowcolumns);
 
         holders.numbers = document.createElement('div')
@@ -190,13 +197,11 @@ export class DataTable {
 
     onViewportScroll() {
         this.scrolls = this.scrolls || 0;
-        //if (this.scrolls % 5 !== 0) { this.scrolls++; return; };
         var left = this.helper.px(this.holders.viewport.scrollLeft * -1);
         var top = this.helper.px(this.holders.viewport.scrollTop * -1);
 
         this.holders.columns.scrollLeft = this.holders.viewport.scrollLeft;
         this.holders.numbers.scrollTop = this.holders.viewport.scrollTop;
-        console.log('scroll', this.holders.viewport.scrollTop);
 
         if (!this.renderTimer) {
             this.renderTimer = setTimeout(() => {
@@ -208,9 +213,9 @@ export class DataTable {
 
     renderNumber(rowIndex) {
         var rowContainer = document.createElement('div');
-        rowContainer.style.top     = (rowIndex * this.config.row.height) + 'px';
+        rowContainer.style.top      = (rowIndex * this.config.row.height) + 'px';
         rowContainer.style.position = 'absolute';
-        rowContainer.style.height  = this.helper.px(this.config.row.height);
+        rowContainer.style.height   = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
         rowContainer.style['width'] = '100%';
 
@@ -256,11 +261,15 @@ export class DataTable {
 
         var range = this.helper.range(first, last);
         for (var x in this.rowCache) {
-            if (x < first || x > last) {
+            if (x < first || x > last || this.selection.isAnyYCellSelected(x)) {
                 this.holders.viewport_content.removeChild(this.rowCache[x]);
                 this.holders.numbers_inner.removeChild(this.numbersCache[x]);
                 delete this.rowCache[x];
                 delete this.numbersCache[x];
+            } else {
+                for (var i = 0; i < this.rowCache[x].children.length; i++) {
+                    this.rowCache[x].children[i].style.background = 'none';
+                }
             }
         }
         range.forEach(n => {
@@ -330,7 +339,6 @@ export class DataTable {
         rowContainer.style.height  = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
         rowContainer.style['position'] = 'absolute';
-        //this.status(this.getTotalWidth());
         rowContainer.style.width   = this.helper.px(5000);
         rowContainer.style.height  = this.config.row.height + 'px';
         var dis = this;
@@ -344,7 +352,6 @@ export class DataTable {
             outer_div.addEventListener("mouseenter", function(e) {
                 dis.selection.onMouseEnter.apply(dis.selection, [colIndex, rowIndex, e]);
             }, false);
-            //outer_div.className     = column.class;
             outer_div.style.top     = (rowIndex * this.config.row.height) + 'px';
             outer_div.style.height  = this.helper.px(this.config.row.height);
             outer_div.style.float   = 'left';
@@ -360,7 +367,6 @@ export class DataTable {
                 }
                 outer_div.style['background'] = 'rgb(210, 236, 255)';
             } else {
-                //outer_div.style['border'] = '1px solid #0a8eec';
             }
             outer_div.style.width   = this.helper.px(this.data.columns[colIndex].width);
 

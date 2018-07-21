@@ -12,11 +12,13 @@ export default {
         this.dt = new DataTable(this.$refs.datatable);
         var data = require('./DataTable/data.js').default;
         //console.log('MOUNTED', Object.keys(this.$props.value));
-        console.log('MOUNTED', this.$props.value);
         this.dt.setData(this.$props.value);
         this.$root.nifty.on('resize', () => {
             this.dt.invalidate();
         });
+    },
+    beforeDestroy() {
+        this.dt.destroy();
     },
     components: {
     },
@@ -24,9 +26,7 @@ export default {
     },
     watch: {
         value: function(n, o) {
-            console.log('WATCH', n);
             this.dt.setData(n);
-            //dt.setData(n);
         }
     }
 }

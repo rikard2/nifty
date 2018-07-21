@@ -11,6 +11,16 @@ export class SelectionManager {
     constructor() {
     }
 
+    isAnyYCellSelected(y) {
+        var ranges = this.ranges.concat(this.activeRange || []);
+        for (var i = 0; i < ranges.length; i++) {
+            var r = ranges[i];
+            if (y >= r.minY && y <= r.maxY) return true;
+        }
+
+        return false;
+    }
+
     isCellSelected(x, y, selectionRanges) {
         var ranges = this.ranges.concat(this.activeRange || []);
         if (ranges.length > 0) {
@@ -103,7 +113,6 @@ export class SelectionManager {
                                      maxY: newY };
                 this.lastCell = this.startCell = { x: newX, y: newY };
                 this.onCellActive(newX, newY);
-                console.log('onCellActive', newX, newY);
             } else if (this.lastCell && (e.metaKey || e.shiftKey)) {
                 if (e.keyCode == 37) {
                     newX = 0;
