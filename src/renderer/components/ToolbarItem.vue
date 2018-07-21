@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="icon">
-            <img id="logo" :width="this.size || 24" :height="this.size || 24" ref="logo" :src="require(`@/assets/icons/` + this.icon + `.svg`)" alt="electron-vue">
+            <img id="logo" :class="{ disabled: this.disabled || false }" :width="this.size || 24" :height="this.size || 24" ref="logo" :src="require(`@/assets/icons/` + this.icon + `.svg`)" alt="electron-vue">
         </div>
         <div class="sep"></div>
     </div>
@@ -10,7 +10,7 @@
 <script>
 export default {
     name: 'toolbarItem',
-    props: ['icon', 'size', 'top'],
+    props: ['icon', 'size', 'top', 'disabled'],
     components: {
     },
     mounted() {
@@ -27,10 +27,14 @@ export default {
 </script>
 
 <style scoped>
+    .disabled {
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }
     .icon {
         float: left;
         height: 30px;
-        width: 28px;
+        width: 22px;
         height: 24px;
         border-radius: 3px;
         padding-right: 1px;

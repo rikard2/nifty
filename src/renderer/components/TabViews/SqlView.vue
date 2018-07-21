@@ -3,8 +3,8 @@
         <div class="sql-view-editor">
             <div style="">
                 <toolbar>
-                    <toolbar-item icon="play" size="14"></toolbar-item>
-                    <toolbar-item icon="stop" size="12"></toolbar-item>
+                    <toolbar-item icon="play" size="12"></toolbar-item>
+                    <toolbar-item icon="stop" size="10" disabled="true"></toolbar-item>
                 </toolbar>
             </div>
             <div style="flex: 1 auto;width: 100%;height: 100%;">
@@ -17,10 +17,10 @@
                     <li @click="tabClick(i)" :class="{ active: i == value.viewstate.result.selected }">{{ r.label }}</li>
                 </ul>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.result.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
                 <data-table v-model="value.viewstate.result.resultsets[value.viewstate.result.selected]"></data-table>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-else="value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.result.selected >= 0 && !value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
                 <div v-for="m in value.viewstate.result.resultsets[value.viewstate.result.selected].messages" class="messages">
                     <pre class="statusmessage">
                         <span class="runtime_instant">instant</span>
@@ -89,12 +89,14 @@ export default {
     vertical-align: middle;
     margin-bottom: 2px;
     font-size: 12px;
+    font-family: menlo;
     display: flex;
+    font-weight: normal;
+    color: #333;
 }
 .runtime_instant {
-    border-right: #1f96ff;
+    border-right: 2px solid #1f96ff;
     background: #ebebeb;
-    color: #fff;
     letter-spacing: 0px;
     font-size: 10px;
     vertical-align: middle;
@@ -103,12 +105,14 @@ export default {
     padding-bottom: 8px;
     display: inline-flex;
     min-width: 58px;
-    margin-right: 5px;
 }
 .message {
     margin-right: 80px;
     display: inline-flex;
-    margin-top: 7px;
+    padding-top: 7px;
+    padding-left: 8px;
+    padding-right: 8px;
+    background: #fafafa;
 }
 .messages {
     padding: 10px;

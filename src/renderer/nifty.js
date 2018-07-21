@@ -3,14 +3,15 @@ const ipc = require('electron').ipcRenderer
 
 export class Nifty {
     listeners = [];
+    zeroRPCClient = null;
     activeEditor = null;
     vm = null;
-
 
     constructor(vm) {
         this.vm = vm;
         console.log('Load of nifty');
 
+        this.db = new (require('./nifty/db').DB)();
         var dis = this;
         ipc.on('command', function(event, msg) {
             dis.send.apply(dis, [ msg.command, msg.payload ]);
@@ -18,26 +19,16 @@ export class Nifty {
 
         this.on('execute-query', () => {
             if (dis.activeEditor) {
-                //vm.$store.state.tabs[0]
-                console.log('vm.$store.state', vm.$store.state);
-                vm.$store.state.tabs[0].viewstate.result.resultsets.push(
-                    {
-                        label: 'Result #2',
-                        resultset: true,
-                        columns: [{
-                            label: 'Nr',
-                            width: 60
-                        },
-                        {
-                            label: 'Name',
-                            width: 300
-                        }],
-                        rows:
-                        Array.apply(null, {length: 59000}).map(Number.call, Number).map(i => {
-                            return [i, 'Jeff Brown']
-                        })
-                    }
-                );
+                vm.$store.state.tabs[0].viewstate.result.selected = -1;
+                vm.$store.state.tabs[0].viewstate.result.resultsets = [];
+                vm.nifty.db.query('Vagrant', dis.activeEditor.getValue())
+                .then(function(response) {
+                    response.label = 'Result #3';
+                    response.resultset = true;
+                    vm.$store.state.tabs[0].viewstate.result.resultsets.push(response);
+                    vm.$store.state.tabs[0].viewstate.result.selected = 0;
+                    console.log('response', vm.$store.state.tabs[0].viewstate.result);
+                });
             }
         });
     }
