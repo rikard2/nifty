@@ -16,7 +16,6 @@ export class DataTable {
             dis.invalidateSoft(ranges);
 
             if (dis.selection.lastCell) {
-                dis.onViewportScroll.apply(dis);
                 dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
             }
         }
@@ -41,6 +40,11 @@ export class DataTable {
         var h = (y + 1) * this.config.row.height;
         if (w >= (this.holders.viewport.clientWidth + this.holders.viewport.scrollLeft)) {
             this.holders.viewport.scrollLeft = w - this.holders.viewport.clientWidth;
+        } else {
+            var l = w - this.getColumn(x).width;
+            if (this.holders.viewport.scrollLeft > l) {
+                this.holders.viewport.scrollLeft = l;
+            }
         }
         if (h >= (this.holders.viewport.clientHeight + this.holders.viewport.scrollTop)) {
             this.holders.viewport.scrollTop = h - this.holders.viewport.clientHeight;
@@ -71,6 +75,9 @@ export class DataTable {
     invalidateSoft(selectionRanges) {
         this.renderVisible(selectionRanges);
         this.renderColumns();
+        if (this.selection.lastCell) {
+            this.onViewportScroll();
+        }
     }
 
     invalidate(selectionRanges) {
@@ -347,7 +354,7 @@ export class DataTable {
             var outer_div           = document.createElement('div');
             outer_div.onmousedown = function(e) {
                 dis.selection.onMouseDown.apply(dis.selection, [colIndex, rowIndex, e]);
-                dis.invalidate();
+                dis.invalidateSoft();
             };
             outer_div.addEventListener("mouseenter", function(e) {
                 dis.selection.onMouseEnter.apply(dis.selection, [colIndex, rowIndex, e]);

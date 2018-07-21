@@ -148,6 +148,15 @@ export class SelectionManager {
             this.copy = true;
             this.onSelectedRangesChanged();
             this.copy = false;
+        } else if (e.metaKey && e.key == 'a') {
+            console.log('cmd+a');
+            this.ranges = [{ minX: 0,
+                             maxX: this.columns - 1,
+                             minY: 0,
+                             maxY: this.rows - 1 }];
+            this.activeRange = null;
+            console.log('ranges', this.ranges);
+            this.onSelectedRangesChanged();
         } else {
             this.onSelectedRangesChanged();
         }
