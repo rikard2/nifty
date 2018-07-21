@@ -28,6 +28,11 @@
                     </pre>
                 </div>
             </div>
+            <div class="resultset-toolbar">
+                <toolbar>
+                    <toolbar-item icon="checked" size="12"></toolbar-item>
+                </toolbar>
+            </div>
         </div>
     </div>
 </template>
@@ -136,6 +141,12 @@ export default {
 }
 .resultset-tab {
     background: #f3f3f3;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 30px;
+}
+.resultset-toolbar {
+    border-top: 1px solid #e0e0e0;
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: 30px;

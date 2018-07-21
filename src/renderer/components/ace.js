@@ -1,4 +1,5 @@
 var ace = require('brace');
+var nifty = require('../nifty');
 
 module.exports = {
     render: function (h) {
@@ -70,10 +71,15 @@ module.exports = {
         var lang = this.lang||'text';
         var theme = this.theme||'chrome';
 
+
         require('brace/ext/emmet');
 
         var editor = vm.editor = ace.edit(this.$el);
         this.$emit('init',editor);
+
+        this.$root.nifty.on('resize', function() {
+            editor.resize();
+        });
 
         editor.$blockScrolling = Infinity;
         editor.setOption("enableEmmet", true);
@@ -91,7 +97,7 @@ module.exports = {
         this.contentBackup = this.value;
 
         var fs = require('fs')
-        fs.readFile('/Users/rikard/git/trustly/schema/public/functions/deposit.sql', 'utf8', function (err,data) {
+        fs.readFile('/Users/rikard/hej.sql', 'utf8', function (err,data) {
 
           if (err) {
             return console.log(err);
