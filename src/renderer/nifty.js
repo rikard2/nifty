@@ -21,14 +21,18 @@ export class Nifty {
             if (dis.activeEditor) {
                 vm.$store.state.tabs[0].viewstate.result.selected = -1;
                 vm.$store.state.tabs[0].viewstate.result.resultsets = [];
+                vm.$store.state.tabs[0].viewstate.executing = true;
                 vm.nifty.db.query('Vagrant', dis.activeEditor.getValue())
                 .then(function(response) {
+                    vm.$store.state.tabs[0].viewstate.executing = false;
                     response.resultsets.forEach((r, i) => {
                         r.label = 'Result #' + (i + 1);
                         r.resultset = true;
                         vm.$store.state.tabs[0].viewstate.result.resultsets.push(r);
                         vm.$store.state.tabs[0].viewstate.result.selected = 0;
                     });
+                })
+                .finally(function() {
                 });
             }
         });

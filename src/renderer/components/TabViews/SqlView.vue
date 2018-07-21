@@ -1,10 +1,10 @@
 <template>
     <div class="sql-view-flex-container">
         <div class="sql-view-editor">
-            <div style="">
+            <div>
                 <toolbar>
-                    <toolbar-item icon="play" size="12"></toolbar-item>
-                    <toolbar-item icon="stop" size="10" disabled="true"></toolbar-item>
+                    <toolbar-item icon="play" size="12" :disabled="value.viewstate.executing"></toolbar-item>
+                    <toolbar-item icon="stop" size="10" :disabled="!value.viewstate.executing"></toolbar-item>
                 </toolbar>
             </div>
             <div style="flex: 1 auto;width: 100%;height: 100%;">
@@ -12,7 +12,10 @@
             </div>
         </div>
         <div v-if="value.viewstate.result" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
-            <div class="resultset-tab">
+            <div v-if="value.viewstate.executing" style="font-size: 12px;margin-top: 30px;font-weight: normal;">
+                Loading...
+            </div>
+            <div class="resultset-tab" v-if="!value.viewstate.executing">
                 <ul v-for="(r, i) in value.viewstate.result.resultsets">
                     <li @click="tabClick(i)" :class="{ active: i == value.viewstate.result.selected }">{{ r.label }}</li>
                 </ul>
@@ -28,10 +31,12 @@
                     </pre>
                 </div>
             </div>
-            <div class="resultset-toolbar">
-                <toolbar>
-                    <toolbar-item icon="checked" size="12"></toolbar-item>
-                </toolbar>
+            <div class="resultset-toolbar" v-if="!value.viewstate.executing">
+                <div class="sql-view-status">
+                    <img style="float: left;padding-top: 3px;height: 16px;width: 16px;" :width="24" :height="24" ref="logo" :src="require(`@/assets/icons/checked.svg`)" alt="electron-vue">
+                    <div class="msg">Query successful.</div>
+                    <div style="clear:both"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -77,6 +82,43 @@ export default {
 </script>
 
 <style>
+.sql-view-status {
+    width: 100%;
+    text-align: left;
+    padding: 5px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fafafa;
+}
+.disabled {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+.sql-view-status .msg {
+    float: left;
+    font-size: 12px;
+    padding-top: 1px;
+    font-weight: normal;
+    margin-left: 5px;
+}
+.sql-view-status .icon {
+    float: left;
+    height: 30px;
+    width: 22px;
+    height: 24px;
+    border-radius: 3px;
+    padding-right: 1px;
+    margin-left: 2px;
+    margin-top: -2px;
+    text-align: center;
+}
+sql-view-status div.sep {
+    float: left;
+    width: 1px;
+    height: 24px;
+    background: #efefef;
+    margin-left: 3px;
+    margin-right: 3px;
+}
 .fill {
     height: 100%;
     width: 100%;

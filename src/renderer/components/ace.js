@@ -71,7 +71,6 @@ module.exports = {
         var lang = this.lang||'text';
         var theme = this.theme||'chrome';
 
-
         require('brace/ext/emmet');
 
         var editor = vm.editor = ace.edit(this.$el);
@@ -104,6 +103,27 @@ module.exports = {
           }
           editor.setValue(data, 1);
         });
+        require("brace/ext/language_tools");
+        var langTools = ace.acequire("ace/ext/language_tools");
+
+        console.log('ACE', langTools);
+        langTools.setCompleters([]);
+        editor.setOptions({
+            enableBasicAutocompletion: false,
+            enableLiveAutocompletion: true,
+            enableSnippets: true
+        });
+        // uses http://rhymebrain.com/api.html
+        var rhymeCompleter = {
+            getCompletions: function(editor, session, pos, prefix, callback) {
+                if (prefix.length === 0) { callback(null, []); return }
+                callback(null, [
+                    {name: 'Boooom', value: 'Boooom', score: 1, meta: "rhyme"}
+                ]);
+            }
+        };
+        langTools.addCompleter(rhymeCompleter);
+        console.log('langTools', langTools);
 
         editor.on('change',function (delta) {
             var content = editor.getValue();

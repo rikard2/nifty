@@ -17,6 +17,16 @@ color: #4D4D4C\
 .ace_scroller.ace_scroll-left {\
     box-shadow: none;\
 }\
+.ace-tomorrow .ace_autocomplete {\
+    font-family: menlo !important;\
+}\
+.ace-tomorrow.ace_active-line {\
+    background: #d8f0ff !important;\
+}\
+.ace-tomorrow .ace_completion-highlight {\
+    text-shadow: none !important;\
+    font-weight: bold !important;\
+}\
 .ace-tomorrow .ace_cursor {\
 color: #AEAFAD\
 }\
