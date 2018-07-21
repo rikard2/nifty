@@ -23,11 +23,12 @@ export class Nifty {
                 vm.$store.state.tabs[0].viewstate.result.resultsets = [];
                 vm.nifty.db.query('Vagrant', dis.activeEditor.getValue())
                 .then(function(response) {
-                    response.label = 'Result #3';
-                    response.resultset = true;
-                    vm.$store.state.tabs[0].viewstate.result.resultsets.push(response);
-                    vm.$store.state.tabs[0].viewstate.result.selected = 0;
-                    console.log('response', vm.$store.state.tabs[0].viewstate.result);
+                    response.resultsets.forEach((r, i) => {
+                        r.label = 'Result #' + (i + 1);
+                        r.resultset = true;
+                        vm.$store.state.tabs[0].viewstate.result.resultsets.push(r);
+                        vm.$store.state.tabs[0].viewstate.result.selected = 0;
+                    });
                 });
             }
         });

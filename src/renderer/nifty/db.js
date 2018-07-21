@@ -77,8 +77,16 @@ export class DB {
                     console.log('err', err);
                     reject(err);
                 } else {
-                    console.log('res', res);
-                    fulfill(dis.cleanResult(res));
+                    var result = {};
+                    result.resultsets = [];
+                    if (Array.isArray(res)) {
+                        result.resultsets = res.map((r) => {
+                            return dis.cleanResult(r);
+                        });
+                    } else {
+                        result.resultsets.push(dis.cleanResult(res));
+                    }
+                    fulfill(result);
                 }
             });
         });
