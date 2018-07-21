@@ -74,7 +74,6 @@ export class DB {
         return new Promise(function(fulfill, reject) {
             client.query(query, (err, res) => {
                 if (err) {
-                    console.log('err', err);
                     reject(err);
                 } else {
                     var result = {};

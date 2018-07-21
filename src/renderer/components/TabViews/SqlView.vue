@@ -33,9 +33,16 @@
             </div>
             <div class="resultset-toolbar" v-if="!value.viewstate.executing">
                 <div class="sql-view-status">
-                    <img style="float: left;padding-top: 3px;height: 16px;width: 16px;" :width="24" :height="24" ref="logo" :src="require(`@/assets/icons/checked.svg`)" alt="electron-vue">
-                    <div class="msg">Query successful.</div>
-                    <div style="clear:both"></div>
+                    <div v-if="!value.viewstate.error">
+                        <img style="float: left;padding-top: 3px;height: 16px;width: 16px;" :width="24" :height="24" ref="logo" :src="require(`@/assets/icons/checked.svg`)" alt="electron-vue">
+                        <div class="msg">{{ value.viewstate.msg }}</div>
+                        <div style="clear:both"></div>
+                    </div>
+                    <div v-if="value.viewstate.error">
+                        <img style="float: left;padding-top: 3px;height: 16px;width: 16px;" :width="24" :height="24" ref="logo" :src="require(`@/assets/icons/error.svg`)" alt="electron-vue">
+                        <div class="msg">{{ value.viewstate.msg }}</div>
+                        <div style="clear:both"></div>
+                    </div>
                 </div>
             </div>
         </div>

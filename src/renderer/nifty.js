@@ -24,15 +24,23 @@ export class Nifty {
                 vm.$store.state.tabs[0].viewstate.executing = true;
                 vm.nifty.db.query('Vagrant', dis.activeEditor.getValue())
                 .then(function(response) {
+                    vm.$store.state.tabs[0].viewstate.error = false;
                     vm.$store.state.tabs[0].viewstate.executing = false;
                     response.resultsets.forEach((r, i) => {
                         r.label = 'Result #' + (i + 1);
                         r.resultset = true;
+                        vm.$store.state.tabs[0].viewstate.msg = 'Query run successfully.';
                         vm.$store.state.tabs[0].viewstate.result.resultsets.push(r);
                         vm.$store.state.tabs[0].viewstate.result.selected = 0;
                     });
+                }, function(err) {
+                    console.log('err', err);
+                    Vue.set(vm.$store.state.tabs[0].viewstate, 'executing', false);
+                    vm.$store.state.tabs[0].viewstate.error = true;
+                    vm.$store.state.tabs[0].viewstate.msg = err;
                 })
                 .finally(function() {
+                    console.log('finally');
                 });
             }
         });
