@@ -1,17 +1,17 @@
 <template>
     <div class="resultset">
-        <table>
-            <tr>
-                <th>Name</th>
-            </tr>
-        </table>
+        name: {{ value.name }}
     </div>
 </template>
 
 <script>
 export default {
     name: 'resultset',
+    props: ['value'],
     components: {
+    },
+    beforeMount() {
+        console.log('BEFORE mount?');
     },
     methods: {
     }

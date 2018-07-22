@@ -8,14 +8,29 @@ export default {
     name: 'dataTable',
     props: ['value'],
     mounted() {
+        var dis = this;
+
         var DataTable = require('./DataTable/datatable.js').DataTable;
-        this.dt = new DataTable(this.$refs.datatable);
+        var dt = new DataTable(this.$refs.datatable);
+        this.dt = dt;
+        dt.onFocus = function() {
+            if (dis.$root.nifty) {
+                dis.$root.nifty.activeDataTable = dt;
+            }
+        };
         var data = require('./DataTable/data.js').default;
         //console.log('MOUNTED', Object.keys(this.$props.value));
         this.dt.setData(this.$props.value);
-        this.$root.nifty.on('resize', () => {
-            this.dt.invalidate();
-        });
+        this.dt.escape = function() {
+            if (dis.$root.nifty) {
+                dis.$root.nifty.activeEditor.focus();
+            }
+        };
+        if (this.$root.nifty) {
+            this.$root.nifty.on('resize', () => {
+                this.dt.invalidate();
+            });
+        }
     },
     beforeDestroy() {
         this.dt.destroy();
@@ -26,6 +41,7 @@ export default {
     },
     watch: {
         value: function(n, o) {
+            this.$root.nifty.activeDataTable = this.dt;
             this.dt.setData(n);
             this.dt.focus();
         }

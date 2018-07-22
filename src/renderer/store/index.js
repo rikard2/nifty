@@ -7,6 +7,37 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+      config: {
+          connectionGroups: {
+              'trustly': {}
+          },
+          connections: {
+              'vagrant': {
+                  'name': 'Vagrant',
+                  'group': 'trustly',
+                  'url': 'postgres://vagrant@192.168.56.125:5432/vagrant'
+              }
+          },
+          lookups: {
+              'userid':
+                  [{
+                      'connection': 'trustly',
+                      'query': 'SELECT * FROM Users WHERE UserID IN ($IDS$)'
+                  }],
+               'orderid': [
+                   {
+                       'connection': 'trustly',
+                       'query': `
+                            SELECT OrderSteps.OrderStepID, OrderSteps.Datestamp, OrderStepTypes.Name
+                            FROM OrderSteps
+                            JOIN OrderStepTypes ON OrderSteps.OrderStepTypeID = OrderStepTypes.OrderStepTypeID
+                            WHERE OrderSteps.OrderID = $ID$
+                            ORDER BY OrderSteps.Datestamp;
+                       `
+                   }
+               ]
+          }
+      },
       filename: '~/git/privat/hej.sql',
       activeTab: {
           index: 0

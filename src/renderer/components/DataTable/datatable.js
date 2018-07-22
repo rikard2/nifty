@@ -4,6 +4,9 @@ export class DataTable {
     selection = new (require('./selection.js').SelectionManager)();
     keyDownListener = null;
 
+    escape = function() {};
+    onFocus = function() {};
+
     constructor(rootElement) {
         this.rootElement = rootElement;
         this.create();
@@ -27,7 +30,7 @@ export class DataTable {
         this.rootElement.innerHTML = '';
         this.holders = this.createHolders()
         this.rootElement.append(this.holders.outerContainer);
-        this.holders.focustextbox.focus();
+        this.focus();
     }
 
     onCellActive(x, y) {
@@ -52,7 +55,7 @@ export class DataTable {
         if (h <= (this.holders.viewport.scrollTop)) {
             this.holders.viewport.scrollTop = h;
         }
-        this.holders.focustextbox.focus();
+        this.focus();
     }
 
     onKeyDown(e) {
@@ -62,6 +65,14 @@ export class DataTable {
 
     getCellValue(x, y) {
         return this.data.rows[y][x];
+    }
+
+    getCellValues(cells) {
+        var str = '';
+        str = cells.map(x => {
+            return this.getCellValue(x[0], x[1]);
+        }).join(',');
+        return str;
     }
 
     onCopy(ranges) {
@@ -85,7 +96,7 @@ export class DataTable {
     }
 
     invalidateSoft(selectionRanges) {
-        this.holders.focustextbox.focus();
+        this.focus();
         this.renderVisible(selectionRanges);
         this.renderColumns();
         if (this.selection.lastCell) {
@@ -103,6 +114,7 @@ export class DataTable {
 
     focus() {
         this.holders.focustextbox.focus();
+        this.onFocus();
     }
     createHolders() {
         var holders = {};
@@ -113,7 +125,11 @@ export class DataTable {
         holders.focustextbox.style.left = '-10000px';
         var dis = this;
         this.keyDownListener = function(e) {
-            dis.selection.onKeyDown.apply(dis.selection, [e]);
+            if (e.key == 'Escape') {
+                dis.escape();
+            } else {
+                dis.selection.onKeyDown.apply(dis.selection, [e]);
+            }
         };
         holders.focustextbox.addEventListener("keydown", this.keyDownListener);
         holders.outerContainer.appendChild(holders.focustextbox);
@@ -381,7 +397,7 @@ export class DataTable {
                 e.preventDefault();
                 dis.selection.onMouseDown.apply(dis.selection, [colIndex, rowIndex, e]);
                 dis.invalidateSoft();
-                dis.holders.focustextbox.focus();
+                dis.focus();
             };
             outer_div.addEventListener("mouseenter", function(e) {
                 dis.selection.onMouseEnter.apply(dis.selection, [colIndex, rowIndex, e]);

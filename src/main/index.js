@@ -35,6 +35,15 @@ const template = [
                         command: 'new'
                     });
                 }
+            },
+            {
+                label: 'Settings',
+                accelerator: 'Cmd+,',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'settings'
+                    });
+                }
             }
         ]
     },
@@ -67,6 +76,24 @@ const template = [
                 click() {
                     mainWindow.webContents.send('command', {
                         command: 'execute-query'
+                    });
+                }
+            },
+            {
+                label: 'Lookup',
+                accelerator: 'Cmd+O',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'lookup'
+                    });
+                }
+            },
+            {
+                label: 'Execute Selected Query',
+                accelerator: 'Cmd+Shift+Enter',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'execute-selected-query'
                     });
                 }
             }
