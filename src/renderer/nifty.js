@@ -76,7 +76,7 @@ export class Nifty {
         this.vm = vm;
         console.info('Load of nifty');
 
-        this.db = new (require('./nifty/db').DB)();
+        this.db = new (require('./nifty/db').DB)(vm);
         var dis = this;
         ipc.on('command', function(event, msg) {
             dis.send.apply(dis, [ msg.command, msg.payload ]);
@@ -130,55 +130,62 @@ export class Nifty {
         });
         this.on('execute-selected-query', () => {
             if (dis.activeEditor) {
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = -1;
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets = [];
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = true;
-                vm.nifty.db.query('Vagrant', dis.activeEditor.getSelectedText())
-                .then(function(response) {
-                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = false;
-                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = false;
-                    response.resultsets.forEach((r, i) => {
-                        r.label = 'Result #' + (i + 1);
-                        r.resultset = true;
-                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
-                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
-                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = 0;
-                    });
-                }, function(err) {
-                    console.log('err', err);
-                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', false);
-                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = true;
-                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = err;
-                })
-                .finally(function() {
-                });
+                var content = dis.activeEditor.getSelectedText();
+                dis.executeQuery.apply(dis, [vm, content]);
             }
         });
         this.on('execute-query', () => {
             if (dis.activeEditor) {
-                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'selected', -1);
-                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'resultsets', []);
-                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', true);
-                vm.nifty.db.query('Vagrant', dis.activeEditor.getValue())
-                .then(function(response) {
-                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'error', false);
-                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', false);
-                    response.resultsets.forEach((r, i) => {
-                        r.label = 'Result #' + (i + 1);
-                        r.resultset = true;
-                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
-                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
-                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = 0;
-                    });
-                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'hide', false);
-                }, function(err) {
-                    console.log('err', err);
-                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', false);
-                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = true;
-                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = err;
-                })
-                .finally(function() {
+                var content = dis.activeEditor.getValue();
+                dis.executeQuery.apply(dis, [vm, content]);
+            }
+        });
+    }
+
+    executeQuery(vm, content) {
+        this.getTabConnection(vm).then(function(connection) {
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].connection = connection;
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = -1;
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets = [];
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = true;
+            vm.nifty.db.query(connection, content)
+            .then(function(response) {
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = false;
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = false;
+                response.resultsets.forEach((r, i) => {
+                    r.label = 'Result #' + (i + 1);
+                    r.resultset = true;
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = 0;
                 });
+                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'hide', false);
+            }, function(err) {
+                console.log('err', err);
+                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', false);
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = true;
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = err;
+            });
+        });
+    }
+
+    getTabConnection(vm) {
+        var connection = vm.$store.state.tabs[vm.$store.state.activeTab.index].connection;
+        return new Promise(function(fulfill, reject) {
+            var config = vm.$store.state.config;
+            if (!connection) {
+                return Modal.choices(Object.keys(config.connections).map(function(alias) {
+                    return {
+                        label: config.connections[alias].name,
+                        value: alias
+                    };
+                })).then(function(res) {
+                    fulfill(res);
+                }, function(err) {
+                    reject(err);
+                });
+            } else {
+                fulfill(connection);
             }
         });
     }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="icon">
-            <img id="logo" :class="{ disabled: this.disabled || false }" :width="this.size || 24" :height="this.size || 24" ref="logo" :src="require(`@/assets/icons/` + this.icon + `.svg`)" alt="electron-vue">
+            <img id="logo" @click="click" :class="{ disabled: this.disabled || false }" :width="this.size || 24" :height="this.size || 24" ref="logo" :src="require(`@/assets/icons/` + this.icon + `.svg`)" alt="electron-vue">
         </div>
         <div class="sep"></div>
     </div>
@@ -10,7 +10,7 @@
 <script>
 export default {
     name: 'toolbarItem',
-    props: ['icon', 'size', 'top', 'disabled'],
+    props: ['icon', 'size', 'top', 'disabled', 'command'],
     components: {
     },
     mounted() {
@@ -22,6 +22,9 @@ export default {
         }
     },
     methods: {
+        click: function() {
+            this.$root.nifty.send(this.command);
+        }
     }
 }
 </script>

@@ -57,7 +57,6 @@ export class Modal {
                 },
                 components: components,
                 beforeMount: function() {
-                    console.log('mount?', ModalComponent);
                 },
                 methods: {
                     onChoice: function(choice) {
@@ -65,7 +64,6 @@ export class Modal {
                         document.body.removeChild(overlay);
                         v.$destroy();
                         document.removeEventListener('keydown', onKeyDown);
-                        console.log('FULFILLING', choice);
                         fulfill(choice);
                     }
                 },

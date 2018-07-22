@@ -1,20 +1,12 @@
 const { Client } = require('pg')
 
 export class DB {
-    config = {
-        "connections": {
-            "Vagrant": {
-                "user": "vagrant",
-                "host": "192.168.56.125",
-                "port": 5432,
-                "database": "vagrant",
-                "requiresauthkey": "False",
-                "url": "postgres://vagrant@192.168.56.125:5432/vagrant",
-            }
-        }
-    }
+    vm = null;
+    config = {};
 
-    constructor() {
+    constructor(vm) {
+        this.vm = vm;
+        this.config = vm.$store.state.config;
     }
 
     list_servers() {
