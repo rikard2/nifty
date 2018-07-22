@@ -25,20 +25,35 @@ export class Nifty {
                 if ((lookups || []).length == 1) {
                     var value = this.activeDataTable.getCellValue(x, y);
                     var values = this.activeDataTable.getCellValues(selected);
-                    console.log('values', value, values);
-                    var query = lookups[0].query.replace('$ID$', value);
-                    query = query.replace('$IDS$', values);
-                    this.vm.nifty.db.query('Vagrant', query)
-                    .then(function(response) {
-                        return dis.popup('Lookup', response.resultsets[0]);
-                    }, function(err) {
-                        console.log('err', err);
-                    })
-                    .then(function() {
-                        console.log('POPUP opened');
-                    }, function(err) {
-                        dis.vm.nifty.activeDataTable.focus();
-                    });
+                    console.log('lokkus', lookups[0]);
+                    if (lookups[0].type == 'json') {
+                        var json = { };
+                        try {
+                            json = JSON.parse(value);
+                        } catch (e) {
+
+                        }
+                        dis.popup('JSON', json)
+                        .then(function() {
+                            console.log('POPUP opened');
+                        }, function(err) {
+                            dis.vm.nifty.activeDataTable.focus();
+                        });
+                    } else {
+                        var query = lookups[0].query.replace('$ID$', value);
+                        query = query.replace('$IDS$', values);
+                        this.vm.nifty.db.query('Vagrant', query)
+                        .then(function(response) {
+                            return dis.popup('Lookup', response.resultsets[0]);
+                        }, function(err) {
+                            console.log('err', err);
+                        })
+                        .then(function() {
+                            console.log('POPUP opened');
+                        }, function(err) {
+                            dis.vm.nifty.activeDataTable.focus();
+                        });
+                    }
                 }
             }
             //this.popup('Lookup', )
@@ -152,7 +167,7 @@ export class Nifty {
                 beforeMount: function() {
                     console.log('mount?', ModalComponent);
                 },
-                template: '<div><' + component + ' v-model="this.model"></' + component + '></div>'
+                template: '<div style="width: 100%;height: 100%;"><' + component + ' v-model="this.model"></' + component + '></div>'
             });
             v.$mount(compElement);
             var onKeyDown = function(e) {

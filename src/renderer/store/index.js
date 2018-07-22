@@ -24,6 +24,11 @@ export default new Vuex.Store({
                       'connection': 'trustly',
                       'query': 'SELECT * FROM Users WHERE UserID IN ($IDS$)'
                   }],
+               'serverrequest': [
+                   {
+                       'type': 'json'
+                   }
+               ],
                'orderid': [
                    {
                        'connection': 'trustly',
