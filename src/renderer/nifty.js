@@ -53,17 +53,20 @@ export class Nifty {
                     } else {
                         var query = lookup.query.replace('$ID$', value);
                         query = query.replace('$IDS$', values);
-                        dis.vm.nifty.db.query('Vagrant', query)
-                        .then(function(response) {
-                            return Modal.show('Lookup', response.resultsets[0]);
-                        }, function(err) {
-                            console.log('err', err);
+                        dis.getTabConnection(dis.vm).then(function(connection) {
+                            dis.vm.$store.state.tabs[dis.vm.$store.state.activeTab.index].connection = connection;
+                            return dis.vm.nifty.db.query(connection, query)
+                            .then(function(response) {
+                                return Modal.show('Lookup', response.resultsets[0]);
+                            }, function(err) {
+                                console.log('err', err);
+                            })
+                            .then(function() {
+                                console.log('POPUP opened');
+                            }, function(err) {
+                                dis.vm.nifty.activeDataTable.focus();
+                            });
                         })
-                        .then(function() {
-                            console.log('POPUP opened');
-                        }, function(err) {
-                            dis.vm.nifty.activeDataTable.focus();
-                        });
                     }
                 }, function(err) {
                     console.log('ERROR!!!', err);
