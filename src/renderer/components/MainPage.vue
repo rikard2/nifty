@@ -16,7 +16,7 @@
             <div class="main-tabs">
                 <tabs></tabs>
             </div>
-            <div class="main-tab-view" :key="$store.state.tabs[$store.state.activeTab.index].name">
+            <div v-if="$store.state.activeTab.index >= 0" class="main-tab-view" :key="$store.state.tabs[$store.state.activeTab.index].name">
                 <div v-if="$store.state.tabs[$store.state.activeTab.index].type == 'sql'" class="fill">
                     <sqlview index="" v-model="$store.state.tabs[$store.state.activeTab.index]"></sqlview>
                 </div>

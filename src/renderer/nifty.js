@@ -100,6 +100,37 @@ export class Nifty {
         this.on('lookup', () => {
             dis.lookup.apply(dis);
         });
+        this.on('previous-tab', () => {
+            var newIndex = vm.$store.state.activeTab.index - 1;
+            if (newIndex < 0) {
+                newIndex = 0;
+            }
+            if (vm.$store.state.tabs.length == 0) {
+                newIndex = -1;
+            }
+            vm.$store.state.activeTab.index = newIndex;
+        });
+        this.on('next-tab', () => {
+            var newIndex = vm.$store.state.activeTab.index + 1;
+            if (newIndex >= vm.$store.state.tabs.length) {
+                newIndex = vm.$store.state.tabs.length - 1;
+            }
+            if (vm.$store.state.tabs.length == 0) {
+                newIndex = -1;
+            }
+            vm.$store.state.activeTab.index = newIndex;
+        });
+        this.on('close-tab', () => {
+            var index = vm.$store.state.activeTab.index;
+            vm.$store.state.tabs.splice(index, 1);
+            console.log('tabs', vm.$store.state.tabs);
+            var newIndex = vm.$store.state.activeTab.index - 1;
+            if (newIndex < 0) newIndex = 0;
+            if (vm.$store.state.tabs.length == 0) {
+                newIndex = -1;
+            }
+            Vue.set(vm.$store.state.activeTab, 'index', newIndex);
+        });
         this.on('execute-selected-query', () => {
             if (dis.activeEditor) {
                 vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = -1;

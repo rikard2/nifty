@@ -80,20 +80,8 @@ export default new Vuex.Store({
       },
       filename: '~/git/privat/hej.sql',
       activeTab: {
-          index: 0
+          index: -1
       },
-      tabs: [
-          {
-              name: 'woho.sql',
-              active: true,
-              type: 'sql',
-              viewstate: {
-                  content: 'hej',
-                  result: {
-                      hide: true
-                  }
-              }
-          }
-      ]
+      tabs: []
   }
 });

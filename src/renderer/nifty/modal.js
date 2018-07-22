@@ -8,7 +8,14 @@ export class Modal {
     }
 
     static choices(model) {
-        return Modal.show('Choices', model);
+        return new Promise(function(f, r) {
+            Modal.show('Choices', model)
+            .then(function(choice) {
+                f(choice);
+            }, function(e) {
+                r(e);
+            })
+        });
     }
     static show(component, model) {
         var promise = new Promise(function(fulfill, reject) {

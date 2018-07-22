@@ -37,6 +37,33 @@ const template = [
                 }
             },
             {
+                label: 'Close tab',
+                accelerator: 'Cmd+W',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'close-tab'
+                    });
+                }
+            },
+            {
+                label: 'Previous tab',
+                accelerator: 'Cmd+Alt+Left',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'previous-tab'
+                    });
+                }
+            },
+            {
+                label: 'Next tab',
+                accelerator: 'Cmd+Alt+Right',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'next-tab'
+                    });
+                }
+            },
+            {
                 label: 'Settings',
                 accelerator: 'Cmd+,',
                 click() {
