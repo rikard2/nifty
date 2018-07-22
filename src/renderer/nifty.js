@@ -9,7 +9,7 @@ export class Nifty {
 
     constructor(vm) {
         this.vm = vm;
-        console.log('Load of nifty');
+        console.info('Load of nifty');
 
         this.db = new (require('./nifty/db').DB)();
         var dis = this;
@@ -40,7 +40,6 @@ export class Nifty {
                     vm.$store.state.tabs[0].viewstate.msg = err;
                 })
                 .finally(function() {
-                    console.log('finally');
                 });
             }
         });
@@ -54,7 +53,6 @@ export class Nifty {
     }
 
     send(name, payload) {
-        console.log('SEND', this.$root);
         this.listeners.forEach(l => {
             if (l.name == name) {
                 l.callback.apply(this, [ payload ]);

@@ -39,11 +39,31 @@ const template = [
         ]
     },
     {
+        label: 'Edit',
+        submenu: [
+            {
+                label: 'Copy',
+                accelerator: 'Cmd+C',
+                selector: 'copy:'
+            },
+            {
+                label: 'Cut',
+                accelerator: 'Cmd+X',
+                selector: 'cut:'
+            },
+            {
+                label: 'Paste',
+                accelerator: 'Cmd+V',
+                selector: 'paste:'
+            }
+        ]
+    },
+    {
         label: 'Execute',
         submenu: [
             {
                 label: 'Execute Query',
-                accelerator: 'Cmd+X',
+                accelerator: 'Cmd+Enter',
                 click() {
                     mainWindow.webContents.send('command', {
                         command: 'execute-query'

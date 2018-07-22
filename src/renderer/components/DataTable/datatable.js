@@ -8,16 +8,14 @@ export class DataTable {
         this.rootElement = rootElement;
         this.create();
         var dis = this;
-        this.keyDownListener = function(e) {
-            dis.selection.onKeyDown.apply(dis.selection, [e]);
-        };
-        document.addEventListener("keydown", this.keyDownListener);
         this.selection.onSelectedRangesChanged = function(ranges) {
             dis.invalidateSoft(ranges);
-
             if (dis.selection.lastCell) {
                 dis.onCellActive.apply(dis, [dis.selection.lastCell.x, dis.selection.lastCell.y]);
             }
+        }
+        this.selection.onCopy = function(ranges) {
+            dis.onCopy.apply(dis, [ranges]);
         }
     }
 
@@ -29,7 +27,7 @@ export class DataTable {
         this.rootElement.innerHTML = '';
         this.holders = this.createHolders()
         this.rootElement.append(this.holders.outerContainer);
-        var dis = this;
+        this.holders.focustextbox.focus();
     }
 
     onCellActive(x, y) {
@@ -54,12 +52,25 @@ export class DataTable {
         if (h <= (this.holders.viewport.scrollTop)) {
             this.holders.viewport.scrollTop = h;
         }
+        this.holders.focustextbox.focus();
     }
 
     onKeyDown(e) {
-        //console.log('keydown', e);
     }
     onMouseEnter(e) {
+    }
+
+    getCellValue(x, y) {
+        return this.data.rows[y][x];
+    }
+
+    onCopy(ranges) {
+        const {clipboard} = require('electron')
+        var str = '';
+        str = ranges.map(x => {
+            return this.getCellValue(x[0], x[1]);
+        }).join(',');
+        clipboard.writeText(str);
     }
 
     setData(data) {
@@ -67,12 +78,14 @@ export class DataTable {
         this.data = data;
         this.selection.columns = this.data.columns.length;
         this.selection.rows = this.data.rows.length;
+        this.selection.selectFirst();
         this.holders.numbers_inner.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
         this.holders.viewport_content.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
         this.invalidate();
     }
 
     invalidateSoft(selectionRanges) {
+        this.holders.focustextbox.focus();
         this.renderVisible(selectionRanges);
         this.renderColumns();
         if (this.selection.lastCell) {
@@ -88,9 +101,22 @@ export class DataTable {
         this.renderColumns();
     }
 
+    focus() {
+        this.holders.focustextbox.focus();
+    }
     createHolders() {
         var holders = {};
         holders.outerContainer = document.createElement('div')
+        holders.focustextbox = document.createElement('input')
+        holders.focustextbox.type = 'text';
+        holders.focustextbox.style.position = 'absolute';
+        holders.focustextbox.style.left = '-10000px';
+        var dis = this;
+        this.keyDownListener = function(e) {
+            dis.selection.onKeyDown.apply(dis.selection, [e]);
+        };
+        holders.focustextbox.addEventListener("keydown", this.keyDownListener);
+        holders.outerContainer.appendChild(holders.focustextbox);
         holders.outerContainer.style.width = holders.outerContainer.style.height = '100%';
         holders.outerContainer.style.padding = '5px';
         holders.outerContainer.style['user-select'] = 'none';
@@ -332,7 +358,6 @@ export class DataTable {
             var b = dis.holders.viewport.scrollLeft;
             dis.holders.viewport_content.innerHTML = '';
             dis.renderVisible();
-            console.log('b', b);
             dis.holders.viewport.scrollLeft = b;
         };
         handle.onmousedown = mouseDown;
@@ -353,8 +378,10 @@ export class DataTable {
             var column = this.getColumn(colIndex);
             var outer_div           = document.createElement('div');
             outer_div.onmousedown = function(e) {
+                e.preventDefault();
                 dis.selection.onMouseDown.apply(dis.selection, [colIndex, rowIndex, e]);
                 dis.invalidateSoft();
+                dis.holders.focustextbox.focus();
             };
             outer_div.addEventListener("mouseenter", function(e) {
                 dis.selection.onMouseEnter.apply(dis.selection, [colIndex, rowIndex, e]);

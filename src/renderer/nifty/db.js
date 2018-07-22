@@ -15,8 +15,6 @@ export class DB {
     }
 
     constructor() {
-        console.log('Load DB', this.config);
-        //this.client = new ZeroRPCClient();
     }
 
     list_servers() {

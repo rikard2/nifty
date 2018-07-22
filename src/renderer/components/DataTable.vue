@@ -27,6 +27,7 @@ export default {
     watch: {
         value: function(n, o) {
             this.dt.setData(n);
+            this.dt.focus();
         }
     }
 }

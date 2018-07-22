@@ -81,7 +81,7 @@ module.exports = {
         });
 
         editor.$blockScrolling = Infinity;
-        editor.setOption("enableEmmet", true);
+        //editor.setOption("enableEmmet", true);
         editor.getSession().setMode('ace/mode/'+lang);
         editor.setShowPrintMargin(false);
         editor.setTheme('ace/theme/'+theme);
@@ -106,12 +106,11 @@ module.exports = {
         require("brace/ext/language_tools");
         var langTools = ace.acequire("ace/ext/language_tools");
 
-        console.log('ACE', langTools);
         langTools.setCompleters([]);
         editor.setOptions({
             enableBasicAutocompletion: false,
-            enableLiveAutocompletion: true,
-            enableSnippets: true
+            enableLiveAutocompletion: true
+            //, enableSnippets: true
         });
         // uses http://rhymebrain.com/api.html
         var rhymeCompleter = {
@@ -123,7 +122,6 @@ module.exports = {
             }
         };
         langTools.addCompleter(rhymeCompleter);
-        console.log('langTools', langTools);
 
         editor.on('change',function (delta) {
             var content = editor.getValue();
@@ -131,10 +129,10 @@ module.exports = {
             vm.$emit('input',content);
             vm.contentBackup = content;
         });
-        editor.on('copy', function(str) {
-            console.log('copy!', str);
-        });
         if(vm.options)
             editor.setOptions(vm.options);
+
+            editor.on('copy', function(str) {
+            });
     }
 }

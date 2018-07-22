@@ -10,6 +10,10 @@ export class SelectionManager {
 
     constructor() {
     }
+    selectFirst() {
+        this.activeRange = {minX:0,maxX:0,minY:0,maxY:0};
+        this.lastCell = { x: 0, y: 0 };
+    }
 
     isAnyYCellSelected(y) {
         var ranges = this.ranges.concat(this.activeRange || []);
@@ -19,6 +23,25 @@ export class SelectionManager {
         }
 
         return false;
+    }
+
+    expandRange(range) {
+        var r = [];
+        for (var x = range.minX; x <= range.maxX; x++) {
+            for (var y = range.minY; y <= range.maxY; y++) {
+                r.push([x, y]);
+            }
+        }
+        return r;
+    }
+    getSelectedRange() {
+        var cells = [];
+        var ranges = this.ranges.concat(this.activeRange || []);
+        for (var i = 0; i < ranges.length; i++) {
+            var range = this.expandRange(ranges[i]);
+            cells = cells.concat(range);
+        }
+        return cells;
     }
 
     isCellSelected(x, y, selectionRanges) {
@@ -148,6 +171,7 @@ export class SelectionManager {
             this.copy = true;
             this.onSelectedRangesChanged();
             this.copy = false;
+            this.onCopy(this.getSelectedRange());
         } else if (e.metaKey && e.key == 'a') {
             console.log('cmd+a');
             this.ranges = [{ minX: 0,
