@@ -87,6 +87,9 @@ export class DataTable {
     setData(data) {
         this.create();
         this.data = data;
+        for (var i = 0; i < this.data.columns.length; i++) {
+            this.data.columns[i].width = this.getColumnWidth(i);
+        }
         this.selection.columns = this.data.columns.length;
         this.selection.rows = this.data.rows.length;
         this.selection.selectFirst();
@@ -380,6 +383,27 @@ export class DataTable {
 
         return handle;
     }
+    formatCell(value, column) {
+        if (column.type == 'TIMESTAMP_TZ') {
+            return new Date(value).toLocaleString('sv-SE');
+        }
+        return value;
+    }
+
+    getColumnWidth(columnIndex) {
+        var col = this.getColumn(columnIndex);
+        if (col.type == 'TIMESTAMP_TZ') return 155;
+        if (this.data.rows.length > 5000) return 200;
+        var max = 0;
+        for (var i = 0; i < this.data.rows.length; i++) {
+            var len = (this.data.rows[i][columnIndex] || '').toString().length;
+            if (len > max) max = len;
+        }
+        var width = max * 10;
+        if (width > 200) return 300;
+        if (width < 50) return 100;
+        return width;
+    }
 
     renderRow(row, rowIndex, selectionRanges) {
         var rowContainer = document.createElement('div');
@@ -387,7 +411,7 @@ export class DataTable {
         rowContainer.style.height  = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
         rowContainer.style['position'] = 'absolute';
-        rowContainer.style.width   = this.helper.px(5000);
+        rowContainer.style.width   = '100000px';
         rowContainer.style.height  = this.config.row.height + 'px';
         var dis = this;
         row.map((value, colIndex) => {
@@ -421,7 +445,7 @@ export class DataTable {
             outer_div.style.width   = this.helper.px(this.data.columns[colIndex].width);
 
             var inside_div = document.createElement('div');
-            inside_div.innerText = row[colIndex];
+            inside_div.innerText = dis.formatCell(row[colIndex], column);
             inside_div.style['font-family'] = 'menlo';
             inside_div.style['font-weight'] = 'normal';
             inside_div.style['padding-left'] = '4px';

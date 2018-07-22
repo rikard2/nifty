@@ -24,18 +24,17 @@ export default new Vuex.Store({
                       'connection': 'trustly',
                       'query': 'SELECT * FROM Users WHERE UserID IN ($IDS$)'
                   }],
-               'serverrequest': [
-                   {
-                       'type': 'json'
-                   }
-               ],
+               'serverrequest': [{ 'type': 'json' }],
+               'clientresponse': [{ 'type': 'json' }],
+               'serverstate': [{ 'type': 'json' }],
                'orderid': [
                    {
                        'connection': 'trustly',
                        'query': `
-                            SELECT OrderSteps.OrderStepID, OrderSteps.Datestamp, OrderStepTypes.Name
+                            SELECT OrderSteps.OrderStepID, OrderSteps.Datestamp, WorkerTypes.Name AS WorkerType, OrderStepTypes.Name
                             FROM OrderSteps
                             JOIN OrderStepTypes ON OrderSteps.OrderStepTypeID = OrderStepTypes.OrderStepTypeID
+                            JOIN WorkerTypes ON WorkerTypes.WorkerTypeID = OrderStepTypes.OrderTypeID
                             WHERE OrderSteps.OrderID = $ID$
                             ORDER BY OrderSteps.Datestamp;
                        `

@@ -28,7 +28,11 @@ export class DB {
           .catch(e => console.error('connection error', err.stack))
     }
 
+    formatRow(row, column) {
+        return row;
+    }
     cleanResult(res) {
+        var dis = this;
         var cleaned = {};
         var types = {
             '16': 'BOOL',
@@ -52,7 +56,7 @@ export class DB {
         });
         cleaned.rows = res.rows.map(function(r) {
             return cleaned.columns.map(function(c) {
-                return r[c.name];
+                return dis.formatRow(r[c.name], c);
             });
         });
         return cleaned;
@@ -81,7 +85,7 @@ export class DB {
                             return dis.cleanResult(r);
                         });
                     } else {
-                        result.resultsets.push(dis.cleanResult(res));
+                        result.resultsets.push(dis.cleanResult.apply(dis, [res]));
                     }
                     fulfill(result);
                 }
