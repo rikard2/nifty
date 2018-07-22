@@ -26,6 +26,7 @@ export class Modal {
             content.style.left = 'calc(50% - 400px)',
             content.style.top = '25px',
             content.style.margin = '0 auto';
+            content.style['max-height'] = '400px';
             content.style.opacity = '1';
             content.style['margin-top'] = '50px';
             content.style['z-index'] = '9999';

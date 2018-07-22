@@ -43,6 +43,15 @@ export default new Vuex.Store({
                       `
                   }
                ],
+               'ordertypeid': [
+                  {
+                      query: `
+                        SELECT *
+                        FROM WorkerTypes
+                        ORDER BY WorkerTypeID = $ID$ DESC, WorkerTypeID
+                      `
+                  }
+               ],
                'orderid': [
                    {
                        'connection': 'trustly',
@@ -79,35 +88,6 @@ export default new Vuex.Store({
               active: true,
               type: 'sql',
               viewstate: {
-                  result: {
-                      loading: true,
-                      selected: 1,
-                      resultsets: [
-                          {
-                              label: 'Messages',
-                              resultset: false,
-                              messages: [{
-                                  text: 'whatever'
-                              }]
-                          },
-                          {
-                              label: 'Result #',
-                              resultset: true,
-                              columns: [{
-                                  label: 'Nr',
-                                  width: 60
-                              },
-                              {
-                                  label: 'Name',
-                                  width: 300
-                              }],
-                              rows:
-                              Array.apply(null, {length: 5}).map(Number.call, Number).map(i => {
-                                  return [i, 'Jeff Brown']
-                              })
-                          }
-                      ]
-                  }
               }
           }
       ]

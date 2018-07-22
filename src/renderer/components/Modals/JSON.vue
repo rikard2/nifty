@@ -1,6 +1,6 @@
 <template>
-    <div style="height: 100%;width: 100%;overflow-y: scroll;padding: 10px;">
-        <pre style="width: 100%; height: 100%;font-family: Menlo;font-size: 12px;">{{ JSON.stringify(value, null, '    ') }}</pre>
+    <div style="max-height: 400px;width: 100%;overflow-y: scroll;padding: 10px;">
+        <pre style="width: 100%; height: 100%; font-family: Menlo;font-size: 12px;">{{ JSON.stringify(value, null, '    ') }}</pre>
     </div>
 </template>
 
