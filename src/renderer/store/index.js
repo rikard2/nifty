@@ -27,6 +27,22 @@ export default new Vuex.Store({
                'serverrequest': [{ 'type': 'json' }],
                'clientresponse': [{ 'type': 'json' }],
                'serverstate': [{ 'type': 'json' }],
+               'hostid': [{
+                   query: `
+                    SELECT *
+                    FROM Hosts
+                    WHERE Hosts.HostID IN ($IDS$);
+                   `
+               }],
+               'workerstatusid': [
+                  {
+                      query: `
+                        SELECT *
+                        FROM WorkerStatuses
+                        ORDER BY WorkerStatusID = $ID$ DESC, WorkerStatusID
+                      `
+                  }
+               ],
                'orderid': [
                    {
                        'connection': 'trustly',
