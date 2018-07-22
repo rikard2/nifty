@@ -17,7 +17,6 @@ export class Nifty {
             var x = selected[0][0];
             var y = selected[0][1];
             var column = this.activeDataTable.getColumn(x);
-            console.log('column.name', column.name, config.lookups);
             if (column.name && (config.lookups || {})[column.name]) {
                 var lookups = config.lookups[column.name];
                 new Promise(function(fulfill, reject) {
@@ -83,7 +82,6 @@ export class Nifty {
             dis.send.apply(dis, [ msg.command, msg.payload ]);
         });
         this.on('new', () => {
-            console.log('new');
             vm.$store.state.tabs.push({
                 name: 'Untitled',
                 type: 'sql',
@@ -123,7 +121,6 @@ export class Nifty {
         this.on('close-tab', () => {
             var index = vm.$store.state.activeTab.index;
             vm.$store.state.tabs.splice(index, 1);
-            console.log('tabs', vm.$store.state.tabs);
             var newIndex = vm.$store.state.activeTab.index - 1;
             if (newIndex < 0) newIndex = 0;
             if (vm.$store.state.tabs.length == 0) {
@@ -158,7 +155,6 @@ export class Nifty {
             }
         });
         this.on('execute-query', () => {
-            console.log('execute-query', vm.$store.state.tabs, vm.$store.state.activeTab.index, vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate);
             if (dis.activeEditor) {
                 Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'selected', -1);
                 Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'resultsets', []);

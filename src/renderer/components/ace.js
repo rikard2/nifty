@@ -36,11 +36,12 @@ module.exports = {
         }
     },
     watch:{
-        content:function (val) {
+        value:function (val) {
             if(this.contentBackup !== val){
                 this.editor.setValue(val,1);
                 this.contentBackup = val;
             }
+            this.editor.focus();
         },
         theme:function (newTheme) {
             this.editor.setTheme('ace/theme/'+newTheme);
