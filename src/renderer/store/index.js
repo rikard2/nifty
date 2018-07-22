@@ -30,6 +30,7 @@ export default new Vuex.Store({
                'orderid': [
                    {
                        'connection': 'trustly',
+                       'name': 'Order Steps',
                        'query': `
                             SELECT OrderSteps.OrderStepID, OrderSteps.Datestamp, WorkerTypes.Name AS WorkerType, OrderStepTypes.Name
                             FROM OrderSteps
@@ -37,6 +38,16 @@ export default new Vuex.Store({
                             JOIN WorkerTypes ON WorkerTypes.WorkerTypeID = OrderStepTypes.OrderTypeID
                             WHERE OrderSteps.OrderID = $ID$
                             ORDER BY OrderSteps.Datestamp;
+                       `
+                   },
+                   {
+                       'connection': 'trustly',
+                       'name': 'Order info',
+                       'query': `
+                            SELECT Orders.OrderID, Users.UserID
+                            FROM Orders
+                            JOIN Users ON Users.UserID = Orders.UserID
+                            WHERE OrderID = $ID$;
                        `
                    }
                ]

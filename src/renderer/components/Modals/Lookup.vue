@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="height: 400px;">
         <data-table v-model="value"></data-table>
     </div>
 </template>

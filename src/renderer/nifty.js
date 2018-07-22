@@ -1,6 +1,6 @@
 import Vue from 'vue'
 const ipc = require('electron').ipcRenderer
-
+import { Modal } from './nifty/modal.js';
 export class Nifty {
     listeners = [];
     zeroRPCClient = null;
@@ -22,29 +22,44 @@ export class Nifty {
             console.log('column.name', column.name, config.lookups);
             if (column.name && (config.lookups || {})[column.name]) {
                 var lookups = config.lookups[column.name];
-                if ((lookups || []).length == 1) {
-                    var value = this.activeDataTable.getCellValue(x, y);
-                    var values = this.activeDataTable.getCellValues(selected);
-                    console.log('lokkus', lookups[0]);
-                    if (lookups[0].type == 'json') {
+                new Promise(function(fulfill, reject) {
+                    if (lookups.length > 1) {
+                        return Modal.choices(lookups.map(function(l) {
+                            return {
+                                label: l.name,
+                                value: l
+                            };
+                        })).then(function(choice) {
+                            fulfill(choice);
+                        });
+                    } else if (lookups.length == 1) {
+                        fulfill(lookups[0]);
+                    } else {
+                        reject('');
+                    }
+                }).then(function(lookup) {
+                    console.log('THEN!!!');
+                    var value = dis.activeDataTable.getCellValue(x, y);
+                    var values = dis.activeDataTable.getCellValues(selected);
+                    if (lookup.type == 'json') {
                         var json = { };
                         try {
                             json = JSON.parse(value);
                         } catch (e) {
 
                         }
-                        dis.popup('JSON', json)
+                        Modal.show('JSON', json)
                         .then(function() {
                             console.log('POPUP opened');
                         }, function(err) {
                             dis.vm.nifty.activeDataTable.focus();
                         });
                     } else {
-                        var query = lookups[0].query.replace('$ID$', value);
+                        var query = lookup.query.replace('$ID$', value);
                         query = query.replace('$IDS$', values);
-                        this.vm.nifty.db.query('Vagrant', query)
+                        dis.vm.nifty.db.query('Vagrant', query)
                         .then(function(response) {
-                            return dis.popup('Lookup', response.resultsets[0]);
+                            return Modal.show('Lookup', response.resultsets[0]);
                         }, function(err) {
                             console.log('err', err);
                         })
@@ -54,7 +69,9 @@ export class Nifty {
                             dis.vm.nifty.activeDataTable.focus();
                         });
                     }
-                }
+                }, function(err) {
+                    console.log('ERROR!!!', err);
+                });
             }
             //this.popup('Lookup', )
         }
@@ -123,66 +140,6 @@ export class Nifty {
                 });
             }
         });
-    }
-
-    popup(component, model) {
-        console.log('popup1!!!');
-        var promise = new Promise(function(fulfill, reject) {
-            var overlay = document.createElement('div');
-            overlay.style.position = 'absolute';
-            overlay.style.left = overlay.style.top = overlay.style.right = overlay.style.bottom = '0px';
-            overlay.style.background = '#f0f0f0';
-            overlay.style.opacity = '0.5';
-            overlay.style['z-index'] = '500';
-
-            var content = document.createElement('div');
-            content.id = 'content';
-            content.style.position = 'absolute';
-            content.style.width = '800px';
-            content.style.height = '400px';
-            content.style.left = 'calc(50% - 400px)',
-            content.style.top = '25px',
-            content.style.margin = '0 auto';
-            content.style.opacity = '1';
-            content.style['margin-top'] = '50px';
-            content.style['z-index'] = '9999';
-            content.style.background = '#fff';
-            content.style['box-shadow'] = '0px 0px 5px 1px rgba(0,0,0,0.64)';
-            document.body.appendChild(content);
-            document.body.appendChild(overlay);
-
-            var compElement = document.createElement('div');
-            content.appendChild(compElement);
-            var ModalComponent = require('./components/Modals/' + component + '.vue').default;
-            var components = {};
-            components[component] = ModalComponent;
-            var v = new Vue({
-                name: component,
-                data: function() {
-                    return {
-                        model: model
-                    };
-                },
-                components: components,
-                beforeMount: function() {
-                    console.log('mount?', ModalComponent);
-                },
-                template: '<div style="width: 100%;height: 100%;"><' + component + ' v-model="this.model"></' + component + '></div>'
-            });
-            v.$mount(compElement);
-            var onKeyDown = function(e) {
-                if (e.key == 'Escape') {
-                    document.body.removeChild(content);
-                    document.body.removeChild(overlay);
-                    v.$destroy();
-                    document.removeEventListener('keydown', onKeyDown);
-                    reject();
-                }
-            };
-            document.addEventListener('keydown', onKeyDown);
-        });
-
-        return promise;
     }
 
     on(name, callback) {
