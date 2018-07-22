@@ -49,16 +49,6 @@ var nifty = require('../nifty');
 export default {
     name: 'main-page',
     mounted: function() {
-        var dis = this;
-        this.$root.nifty.on('execute-query', function() {
-
-        });
-        this.$root.nifty.on('new', function() {
-            dis.$store.state.tabs.push({
-                name: 'Untitled',
-                type: 'settings'
-            });
-        });
     },
     directives: {
         resize: ResizeDirective

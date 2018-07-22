@@ -8,8 +8,10 @@ export default {
     },
     unbind: function(el, binding) {
         document.onmousemove = null;
-        binding.handle.onmousedown = null;
-        binding.handle.onmouseup = null;
+        if (binding.handle) {
+            binding.handle.onmousedown = null;
+            binding.handle.onmouseup = null;
+        }
     },
     inserted: function (el, binding, vnode) {
         var direction = binding.value.direction;

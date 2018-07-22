@@ -12,9 +12,7 @@ export class Nifty {
         var dis = this;
         var config = this.vm.$store.state.config;
         var selected = this.activeDataTable.selection.getSelectedRange();
-        //if (selected.)
-        //var lookup = (config.lookups || {})[]
-        console.log('range', selected);
+
         if (selected.length > 0) {
             var x = selected[0][0];
             var y = selected[0][1];
@@ -38,7 +36,6 @@ export class Nifty {
                         reject('');
                     }
                 }).then(function(lookup) {
-                    console.log('THEN!!!');
                     var value = dis.activeDataTable.getCellValue(x, y);
                     var values = dis.activeDataTable.getCellValues(selected);
                     if (lookup.type == 'json') {
@@ -85,56 +82,73 @@ export class Nifty {
         ipc.on('command', function(event, msg) {
             dis.send.apply(dis, [ msg.command, msg.payload ]);
         });
+        this.on('new', () => {
+            console.log('new');
+            vm.$store.state.tabs.push({
+                name: 'Untitled',
+                type: 'sql',
+                viewstate: {
+                    content: '',
+                    executing: false,
+                    result: {
+                        hide: true
+                    }
+                }
+            });
+            vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
+        });
         this.on('lookup', () => {
             dis.lookup.apply(dis);
         });
         this.on('execute-selected-query', () => {
             if (dis.activeEditor) {
-                vm.$store.state.tabs[0].viewstate.result.selected = -1;
-                vm.$store.state.tabs[0].viewstate.result.resultsets = [];
-                vm.$store.state.tabs[0].viewstate.executing = true;
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = -1;
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets = [];
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = true;
                 vm.nifty.db.query('Vagrant', dis.activeEditor.getSelectedText())
                 .then(function(response) {
-                    vm.$store.state.tabs[0].viewstate.error = false;
-                    vm.$store.state.tabs[0].viewstate.executing = false;
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = false;
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = false;
                     response.resultsets.forEach((r, i) => {
                         r.label = 'Result #' + (i + 1);
                         r.resultset = true;
-                        vm.$store.state.tabs[0].viewstate.msg = 'Query run successfully.';
-                        vm.$store.state.tabs[0].viewstate.result.resultsets.push(r);
-                        vm.$store.state.tabs[0].viewstate.result.selected = 0;
+                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
+                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
+                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = 0;
                     });
                 }, function(err) {
                     console.log('err', err);
-                    Vue.set(vm.$store.state.tabs[0].viewstate, 'executing', false);
-                    vm.$store.state.tabs[0].viewstate.error = true;
-                    vm.$store.state.tabs[0].viewstate.msg = err;
+                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', false);
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = true;
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = err;
                 })
                 .finally(function() {
                 });
             }
         });
         this.on('execute-query', () => {
+            console.log('execute-query', vm.$store.state.tabs, vm.$store.state.activeTab.index, vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate);
             if (dis.activeEditor) {
-                vm.$store.state.tabs[0].viewstate.result.selected = -1;
-                vm.$store.state.tabs[0].viewstate.result.resultsets = [];
-                vm.$store.state.tabs[0].viewstate.executing = true;
+                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'selected', -1);
+                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'resultsets', []);
+                Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', true);
                 vm.nifty.db.query('Vagrant', dis.activeEditor.getValue())
                 .then(function(response) {
-                    vm.$store.state.tabs[0].viewstate.error = false;
-                    vm.$store.state.tabs[0].viewstate.executing = false;
+                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'error', false);
+                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', false);
                     response.resultsets.forEach((r, i) => {
                         r.label = 'Result #' + (i + 1);
                         r.resultset = true;
-                        vm.$store.state.tabs[0].viewstate.msg = 'Query run successfully.';
-                        vm.$store.state.tabs[0].viewstate.result.resultsets.push(r);
-                        vm.$store.state.tabs[0].viewstate.result.selected = 0;
+                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
+                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
+                        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = 0;
                     });
+                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'hide', false);
                 }, function(err) {
                     console.log('err', err);
-                    Vue.set(vm.$store.state.tabs[0].viewstate, 'executing', false);
-                    vm.$store.state.tabs[0].viewstate.error = true;
-                    vm.$store.state.tabs[0].viewstate.msg = err;
+                    Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate, 'executing', false);
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = true;
+                    vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = err;
                 })
                 .finally(function() {
                 });

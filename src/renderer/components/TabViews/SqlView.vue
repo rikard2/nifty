@@ -8,10 +8,10 @@
                 </toolbar>
             </div>
             <div style="flex: 1 auto;width: 100%;height: 100%;">
-                <editor v-model="value.viewstate.content"></editor>
+                <editor :content="value.viewstate.content" v-on:change="editorchange"></editor>
             </div>
         </div>
-        <div v-if="value.viewstate.result" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
+        <div v-if="!value.viewstate.result.hide" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
             <div v-if="value.viewstate.executing" style="font-size: 12px;margin-top: 30px;font-weight: normal;">
                 Loading...
             </div>
@@ -65,6 +65,7 @@ export default {
     directives: {
         resize: ResizeDirective
     },
+    events: ['editorchange'],
     data() {
         return {
             filename: this.$store.state.filename
@@ -83,6 +84,9 @@ export default {
     methods: {
         tabClick: function(i) {
             this.$props.value.viewstate.result.selected = i;
+        },
+        editorchange: function(c) {
+            this.value.viewstate.content = c;
         }
     }
 }

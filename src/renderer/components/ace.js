@@ -11,7 +11,7 @@ module.exports = {
         })
     },
     props:{
-        value:{
+        value: {
             type:String,
             required:true
         },
@@ -24,7 +24,7 @@ module.exports = {
     data: function () {
         return {
             editor:null,
-            contentBackup:""
+            contentBackup: ""
         }
     },
     methods: {
@@ -36,7 +36,7 @@ module.exports = {
         }
     },
     watch:{
-        value:function (val) {
+        content:function (val) {
             if(this.contentBackup !== val){
                 this.editor.setValue(val,1);
                 this.contentBackup = val;
@@ -101,7 +101,7 @@ module.exports = {
           if (err) {
             return console.log(err);
           }
-          editor.setValue(data, 1);
+          //editor.setValue(data, 1);
         });
         require("brace/ext/language_tools");
         var langTools = ace.acequire("ace/ext/language_tools");
@@ -123,12 +123,13 @@ module.exports = {
         };
         langTools.addCompleter(rhymeCompleter);
 
-        editor.on('change',function (delta) {
+        editor.on('change',function () {
             var content = editor.getValue();
+            vm.$emit('input', content);
             vm.$root.nifty.activeEditor = editor;
-            vm.$emit('input',content);
             vm.contentBackup = content;
         });
+
         if(vm.options)
             editor.setOptions(vm.options);
 

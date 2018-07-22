@@ -1,24 +1,23 @@
 <template>
     <div class="sql-editor">
-        <ace-editor v-model="value" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
+        <ace-editor :value="content" @input="change" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
     </div>
 </template>
 
 <script>
 export default {
     name: 'editor',
+    props: ['content'],
+    events: ['change'],
     components: {
         aceEditor: require('./ace.js')
     },
     mounted() {
     },
-    data () {
-        return {
-            editor_content: 'lool',
-            value: ''
-        }
-    },
     methods: {
+        change: function(c) {
+            this.$emit('change', c);
+        },
         editorInit: function () {
             require('brace/mode/html')
             require('brace/mode/javascript')    //language

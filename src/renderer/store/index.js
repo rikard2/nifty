@@ -88,6 +88,10 @@ export default new Vuex.Store({
               active: true,
               type: 'sql',
               viewstate: {
+                  content: 'hej',
+                  result: {
+                      hide: true
+                  }
               }
           }
       ]

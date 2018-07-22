@@ -1,7 +1,7 @@
 <template>
     <div class="tabs-component">
-        <ul v-for="tab in $store.state.tabs">
-            <li @click="selectTab(tab)" v-bind:class="{ active: tab.active }">{{ tab.name }}</li>
+        <ul v-for="(tab, i) in $store.state.tabs">
+            <li @click="selectTab(tab, i)" v-bind:class="{ active: $store.state.activeTab.index == i }">{{ tab.name }}</li>
         </ul>
     </div>
 </template>
@@ -21,10 +21,8 @@ export default {
         }
     },
     methods: {
-        selectTab(tab) {
-            Vue.set(this.$store.state, 'activeTab', tab);
-            this.$store.state.tabs.forEach(x => { Vue.set(x, 'active', false) });
-            Vue.set(tab, 'active', true);
+        selectTab(tab, index) {
+            Vue.set(this.$store.state.activeTab, 'index', index);
         }
     }
 }
