@@ -54,6 +54,35 @@ export class DB {
         return cleaned;
     }
 
+    async queryAsync(alias, query) {
+        var conf = this.config['connections'][alias];
+        if (!conf) throw('No available config');
+
+        var client = new Client({
+            connectionString: conf.url
+        });
+        client.connect();
+        var result = await this.clientQuery(client, query);
+        return result;
+    }
+    async clientQuery(client, query) {
+        var dis = this;
+        return new Promise((resolve, reject) => {
+            client.query(query, (err, res) => {
+                if (err) return reject(err);
+
+                var result = { resultsets: [] };
+                if (Array.isArray(res)) {
+                    result.resultsets = res.map((r) => {
+                        return dis.cleanResult(r);
+                    });
+                } else {
+                    result.resultsets.push(dis.cleanResult.apply(dis, [res]));
+                }
+                resolve(result);
+            });
+        });
+    }
     query(alias, query) {
         var conf = this.config['connections'][alias];
         if (!conf) {

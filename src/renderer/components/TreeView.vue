@@ -17,6 +17,7 @@ export default {
 
 <style scoped>
     .tree-view {
+        font-size: 14px;
         text-align: left;
         padding: 5px;
         padding-left: 10px;

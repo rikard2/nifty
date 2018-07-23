@@ -45,7 +45,6 @@ export class Modal {
             var compElement = document.createElement('div');
             content.appendChild(compElement);
             var ModalComponent = require('../components/Modals/' + component + '.vue').default;
-            console.log('mc', ModalComponent);
             var components = {};
             components[component] = ModalComponent;
             var v = new Vue({
@@ -76,7 +75,7 @@ export class Modal {
                     document.body.removeChild(overlay);
                     v.$destroy();
                     document.removeEventListener('keydown', onKeyDown);
-                    reject();
+                    fulfill();
                 }
             };
             document.addEventListener('keydown', onKeyDown);
