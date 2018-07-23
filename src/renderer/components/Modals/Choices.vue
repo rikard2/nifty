@@ -1,6 +1,7 @@
 <template>
     <div style="height: 100%;width: 100%;overflow-y: scroll;">
         <input type="text" ref="focustextbox" style="position: absolute;left: -10000px"></input>
+        <div class="header">Choose connection</div>
         <div v-for="(m, i) in value" class="choice" :class="{ selected: i == selectedIndex }">
             {{ m.label }}
         </div>
@@ -44,6 +45,11 @@ export default {
 </script>
 
 <style scoped>
+div.header {
+    padding: 15px;
+    background: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+}
 div.choice {
     width: 100%;
     padding: 15px;
@@ -53,6 +59,6 @@ div.choice:last-child {
     border-bottom: none;
 }
 div.choice.selected {
-    background: #efefef;
+    background: #b7f0ff;
 }
 </style>

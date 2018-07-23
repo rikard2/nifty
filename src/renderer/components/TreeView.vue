@@ -1,6 +1,7 @@
 <template>
     <div class="tree-view">
-        
+        <div>Problems</div>
+        <div>Files</div>
     </div>
 </template>
 
@@ -16,6 +17,9 @@ export default {
 
 <style scoped>
     .tree-view {
+        text-align: left;
+        padding: 5px;
+        padding-left: 10px;
         width: 100%;
         height: 100%;
     }
