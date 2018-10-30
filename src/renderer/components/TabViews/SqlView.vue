@@ -17,14 +17,14 @@
             </div>
             <div class="resultset-tab" v-if="!value.viewstate.executing">
                 <ul v-for="(r, i) in value.viewstate.result.resultsets">
-                    <li @click="tabClick(i)" :class="{ active: i == value.viewstate.result.selected }">{{ r.label }}</li>
+                    <li @click="tabClick(i)" :class="{ active: i == value.viewstate.selected }">{{ r.label }}</li>
                 </ul>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.result.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
-                <data-table v-model="value.viewstate.result.resultsets[value.viewstate.result.selected]"></data-table>
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.selected].resultset">
+                <data-table v-model="value.viewstate.result.resultsets[value.viewstate.selected]"></data-table>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.result.selected >= 0 && !value.viewstate.result.resultsets[value.viewstate.result.selected].resultset">
-                <div v-for="m in value.viewstate.result.resultsets[value.viewstate.result.selected].messages" class="messages">
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && !value.viewstate.result.resultsets[value.viewstate.selected].resultset">
+                <div v-for="m in value.viewstate.result.resultsets[value.viewstate.selected].messages" class="messages">
                     <pre class="statusmessage">
                         <span class="runtime_instant">instant</span>
                         <span class="message">{{ m.text }}</span>
@@ -51,6 +51,7 @@
 
 <script>
 var nifty = require('../../nifty');
+import Vue from 'vue'
 import Editor from '../Editor';
 import Grid from '../LeGrid/Grid';
 import ResizeDirective from '../ResizeDirective';
@@ -68,8 +69,14 @@ export default {
     events: ['editorchange'],
     data() {
         return {
-            filename: this.$store.state.filename
+            filename: this.$store.state.filename,
+            viewstate: this.$store.state.tabs[this.$store.state.activeTab.index].viewstate
         };
+    },
+    filters: {
+        pretty: function(value) {
+            return JSON.stringify(value, '  ', 2);
+        }
     },
     mounted() {
     },
@@ -83,7 +90,7 @@ export default {
     },
     methods: {
         tabClick: function(i) {
-            this.$props.value.viewstate.result.selected = i;
+            this.value.viewstate.selected = i;
         },
         editorchange: function(c) {
             this.value.viewstate.content = c;

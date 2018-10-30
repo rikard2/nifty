@@ -36,9 +36,11 @@ export class Nifty {
                 type: 'sql',
                 viewstate: {
                     content: '',
+                    selected: -1,
                     executing: false,
                     result: {
-                        hide: true
+                        hide: true,
+                        resultsets: []
                     }
                 }
             });
@@ -102,7 +104,7 @@ export class Nifty {
             r.resultset = true;
             vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
             vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
-            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = 0;
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.selected = 0;
         });
         Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'hide', false);
     }
