@@ -25,6 +25,11 @@ export class Nifty {
         this.vm = vm;
         console.info('Load of nifty');
 
+        const dirTree = require('directory-tree');
+        const tree = dirTree('/users/rikard/git/trustly/schema');
+        console.log('tree', tree);
+
+
         this.db = new (require('./nifty/db').DB)(vm);
         var dis = this;
         ipc.on('command', function(event, msg) {

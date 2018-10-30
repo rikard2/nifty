@@ -1,13 +1,17 @@
 <template>
     <div class="tree-view">
-        <div>Problems</div>
-        <div>Files</div>
+        {{ this.folders }}
     </div>
 </template>
 
 <script>
 export default {
     name: 'tree-view',
+    data() {
+        return {
+            folders: ['schema']
+        };
+    },
     components: {
     },
     methods: {
