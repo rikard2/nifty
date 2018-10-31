@@ -9,7 +9,7 @@
     </div>
 -->
     <div class="main-wrapper">
-        <div class="left-side" style="flex-basis: 175px;" v-resize="{ direction: 'horizontal' }">
+        <div class="left-side" style="overflow-x: hidden; flex-basis: 175px;" v-resize="{ direction: 'horizontal' }">
             <tree-view></tree-view>
         </div>
         <div class="main-side">

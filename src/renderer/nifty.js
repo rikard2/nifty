@@ -18,8 +18,18 @@ export class Nifty {
 
         const dirTree = require('directory-tree');
         const tree = dirTree('/users/rikard/git/trustly/schema');
+        const frontend_tree = dirTree('/users/rikard/git/trustly/frontend');
         console.log('tree', tree);
-
+        vm.$store.state.folders = [
+            {
+                "name": "schema",
+                "tree": tree
+            },
+            {
+                "name": "frontend_tree",
+                "tree": frontend_tree
+            }
+        ];
 
         this.db = new (require('./nifty/db').DB)(vm);
         var dis = this;
@@ -38,6 +48,15 @@ export class Nifty {
                         hide: true,
                         resultsets: []
                     }
+                }
+            });
+            vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
+        });
+        this.on('settings', () => {
+            vm.$store.state.tabs.push({
+                name: 'Untitled',
+                type: 'settings',
+                viewstate: {
                 }
             });
             vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;

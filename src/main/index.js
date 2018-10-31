@@ -55,6 +55,15 @@ const template = [
                 }
             },
             {
+                label: 'Settings',
+                accelerator: 'Cmd+,',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'settings'
+                    });
+                }
+            },
+            {
                 label: 'Next tab',
                 accelerator: 'Cmd+Alt+Right',
                 click() {
