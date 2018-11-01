@@ -86,8 +86,9 @@ export default {
 
                 fs.readFile(path, 'utf8', function(err, contents) {
                     if (!err) {
+                        var filename = path.replace(/^.*[\\\/]/, '');
                         vm.$store.state.tabs.push({
-                            name: 'Untitled',
+                            name: filename,
                             type: 'sql',
                             viewstate: {
                                 content: contents,

@@ -12,7 +12,7 @@ export default {
     components: {
     },
     mounted() {
-        this.nifty = 'LOOOOL';
+        this.nifty = '';
     },
     methods: {
         executeQuery() {

@@ -89,13 +89,21 @@ export class Nifty {
             Vue.set(vm.$store.state.activeTab, 'index', newIndex);
         });
         this.on('execute-selected-query', async () => {
+            var index = vm.$store.state.activeTab.index;
+            var content2 = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.content;
+            console.log('contents', content2);
             if (dis.activeEditor) {
+                var index = vm.$store.state.activeTab.index;
                 var content = dis.activeEditor.getSelectedText();
+                var content2 = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.content;
+                console.log('contents', content, content2);
+
                 await this.executeQuery(this.vm, content);
             }
         });
         this.on('execute-query', async () => {
-            var content = dis.activeEditor.getValue();
+            var index = vm.$store.state.activeTab.index;
+            var content = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.content;
             await this.executeQuery(this.vm, content);
         });
     }

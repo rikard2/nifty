@@ -118,7 +118,7 @@ export default new Vuex.Store({
                ]
           }
       },
-      filename: '~/git/privat/hej.sql',
+      filename: '',
       activeTab: {
           index: -1
       },
