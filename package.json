@@ -53,10 +53,10 @@
   "dependencies": {
     "axios": "^0.16.1",
     "directory-tree": "^2.1.0",
+    "element-resize-event": "^3.0.1",
     "emmet": "git+https://github.com/cloud9ide/emmet-core.git#41973fcc70392864c7a469cf5dcd875b88b93d4a",
     "mousetrap": "^1.6.2",
     "pg": "^7.4.3",
-    "pg-native": "^3.0.0",
     "promise": "^8.0.1",
     "vue": "^2.3.3",
     "vue-electron": "^1.0.6",

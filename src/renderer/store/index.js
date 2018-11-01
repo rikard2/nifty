@@ -7,11 +7,51 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+      settings: {
+        'General': {
+        },
+        'Connections': [
+          {
+            'title': 'Connections',
+            'type': 'list',
+            'value': [
+              {
+                    'name': 'Local',
+                    'group': 'trustly',
+                    'url': 'postgres://127.0.0.1:5432/rikardjavelind'
+                },
+              {
+                    'name': 'Vagrant',
+                    'group': 'trustly',
+                    'url': 'postgres://vagrant@192.168.56.125:5432/vagrant'
+                }
+            ]
+        }
+      ],
+      'Folders': [
+        {
+          'title': 'Connections',
+          'type': 'list',
+          'value': [
+            {
+                  'name': 'Vagrant',
+                  'group': 'trustly',
+                  'url': 'postgres://vagrant@192.168.56.125:5432/vagrant'
+              }
+          ]
+      }
+    ]
+    },
       config: {
           connectionGroups: {
               'trustly': {}
           },
           connections: {
+            'local': {
+                'name': 'Local',
+                'group': 'trustly',
+                'url': 'postgres://127.0.0.1:5432/rikardjavelind'
+            },
               'vagrant': {
                   'name': 'Vagrant',
                   'group': 'trustly',

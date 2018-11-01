@@ -20,10 +20,10 @@
                     <li @click="tabClick(i)" :class="{ active: i == value.viewstate.selected }">{{ r.label }}</li>
                 </ul>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.selected].resultset">
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.selected]">
                 <data-table v-model="value.viewstate.result.resultsets[value.viewstate.selected]"></data-table>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && !value.viewstate.result.resultsets[value.viewstate.selected].resultset">
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && !value.viewstate.result.resultsets[value.viewstate.selected]">
                 <div v-for="m in value.viewstate.result.resultsets[value.viewstate.selected].messages" class="messages">
                     <pre class="statusmessage">
                         <span class="runtime_instant">instant</span>

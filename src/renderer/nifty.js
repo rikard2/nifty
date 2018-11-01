@@ -17,17 +17,12 @@ export class Nifty {
         console.info('Load of nifty');
 
         const dirTree = require('directory-tree');
-        const tree = dirTree('/users/rikard/git/trustly/schema');
-        const frontend_tree = dirTree('/users/rikard/git/trustly/frontend');
+        const tree = dirTree('/users/rikardjavelind/nifty');
         console.log('tree', tree);
         vm.$store.state.folders = [
             {
                 "name": "schema",
                 "tree": tree
-            },
-            {
-                "name": "frontend_tree",
-                "tree": frontend_tree
             }
         ];
 
@@ -54,7 +49,7 @@ export class Nifty {
         });
         this.on('settings', () => {
             vm.$store.state.tabs.push({
-                name: 'Untitled',
+                name: 'Settings',
                 type: 'settings',
                 viewstate: {
                 }
