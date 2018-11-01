@@ -51,6 +51,7 @@ export class DB {
                 return dis.formatRow(r[c.name], c);
             });
         });
+        cleaned.rowCount = res.rowCount;
         return cleaned;
     }
 
@@ -68,17 +69,38 @@ export class DB {
     async clientQuery(client, query) {
         var dis = this;
         return new Promise((resolve, reject) => {
-            client.query(query, (err, res) => {
-                if (err) return reject(err);
+            var notices = [];
+            client.on('notice', function(notice, b) {
+                var n = {
+                    severity: notice.severity,
+                    text: notice.message
+                };
+                notices.push(n);
+                console.log('notice', n);
+            });
 
+            client.query(query, (err, res) => {
+                console.log('err', err);
+                if (err) return reject(err);
+                console.log('res', res);
                 var result = { resultsets: [] };
                 if (Array.isArray(res)) {
                     result.resultsets = res.map((r) => {
+                        notices.push({
+                            severity: r.command,
+                            count: r.rowCount
+                        });
                         return dis.cleanResult(r);
                     });
                 } else {
                     result.resultsets.push(dis.cleanResult.apply(dis, [res]));
+                    notices.push({
+                        severity: res.command,
+                        count: res.rowCount
+                    });
                 }
+                result.notices = notices;
+                console.log('notices', notices);
                 resolve(result);
             });
         });
@@ -103,6 +125,10 @@ export class DB {
                     result.resultsets = [];
                     if (Array.isArray(res)) {
                         result.resultsets = res.map((r) => {
+                            notices.push({
+                                type: r.command,
+                                count: r.rowCount
+                            })
                             return dis.cleanResult(r);
                         });
                     } else {

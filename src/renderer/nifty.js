@@ -17,14 +17,15 @@ export class Nifty {
         console.info('Load of nifty');
 
         const dirTree = require('directory-tree');
-        const tree = dirTree('/users/rikardjavelind/nifty');
-        console.log('tree', tree);
-        vm.$store.state.folders = [
-            {
-                "name": "schema",
-                "tree": tree
-            }
-        ];
+        const tree = dirTree('/users/rikard/nifty/sql_test');
+        if (tree) {
+            vm.$store.state.folders = [
+                {
+                    "name": "schema",
+                    "tree": tree
+                }
+            ];
+        }
 
         this.db = new (require('./nifty/db').DB)(vm);
         var dis = this;
@@ -102,21 +103,44 @@ export class Nifty {
     async executeQuery(vm, content) {
         var connection = await this.getTabConnection(vm);
         vm.$store.state.tabs[vm.$store.state.activeTab.index].connection = connection;
+        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = false;
         vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = -1;
         vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets = [];
         vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = true;
 
-        var result = await vm.nifty.db.queryAsync(connection, content);
-        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = false;
-        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = false;
-        result.resultsets.forEach((r, i) => {
-            r.label = 'Result #' + (i + 1);
-            r.resultset = true;
-            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
-            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
-            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.selected = 0;
+        await vm.nifty.db.queryAsync(connection, content)
+        .then(function(result) {
+            if (result.notices && result.notices.length) {
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push({
+                    label: 'Notices',
+                    notices: result.notices
+                });
+            }
+            result.resultsets.forEach((r, i) => {
+                if (r.rowCount == undefined) return;
+                r.label = 'Result #' + (i + 1);
+                r.resultset = true;
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
+
+            });
+            var resultsetCount = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.length;
+            if (resultsetCount == 1) {
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Statement run successfully.';
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.selected = 0;
+            } else if (resultsetCount > 1) {
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
+                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.selected = 1;
+            }
+        })
+        .catch(function(err) {
+            console.log('cauthyt', err.message);
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = err.message;
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Statement failed with errors.';
+        })
+        .finally(function() {
+            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = false;
+            Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'hide', false);
         });
-        Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'hide', false);
     }
 
     async getTabConnection(vm) {

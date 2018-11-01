@@ -15,21 +15,24 @@
             <div v-if="value.viewstate.executing" style="font-size: 12px;margin-top: 30px;font-weight: normal;">
                 Loading...
             </div>
-            <div class="resultset-tab" v-if="!value.viewstate.executing">
+            <div class="resultset-tab" v-if="!value.viewstate.executing && value.viewstate.result.resultsets && value.viewstate.result.resultsets.length > 0">
                 <ul v-for="(r, i) in value.viewstate.result.resultsets">
                     <li @click="tabClick(i)" :class="{ active: i == value.viewstate.selected }">{{ r.label }}</li>
                 </ul>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.selected]">
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.selected] && !value.viewstate.result.resultsets[value.viewstate.selected].notices">
                 <data-table v-model="value.viewstate.result.resultsets[value.viewstate.selected]"></data-table>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && !value.viewstate.result.resultsets[value.viewstate.selected]">
-                <div v-for="m in value.viewstate.result.resultsets[value.viewstate.selected].messages" class="messages">
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected == 0 && value.viewstate.result.resultsets[value.viewstate.selected] && value.viewstate.result.resultsets[value.viewstate.selected].notices">
+                <div v-for="n in value.viewstate.result.resultsets[value.viewstate.selected].notices" class="messages">
                     <pre class="statusmessage">
-                        <span class="runtime_instant">instant</span>
-                        <span class="message">{{ m.text }}</span>
+                        <span class="runtime_instant">{{ n.severity }}</span>
+                        <span class="message">{{ n.text || n.count }}</span>
                     </pre>
                 </div>
+            </div>
+            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.error">
+                <pre class="errormessage">{{ value.viewstate.error }}</pre>
             </div>
             <div class="resultset-toolbar" v-if="!value.viewstate.executing">
                 <div class="sql-view-status">
@@ -147,6 +150,13 @@ sql-view-status div.sep {
     flex-direction: column;
     display: flex;
 }
+.errormessage {
+    padding: 10px;
+    font-size: 12px;
+    font-family: menlo;
+    text-align: left;
+    font-weight: normal;
+}
 .statusmessage {
     border-top-left-radius: 0px;
     border-radius: 0px;
@@ -179,8 +189,15 @@ sql-view-status div.sep {
     padding-right: 8px;
     background: #fafafa;
 }
+.error {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-right: 10px;
+}
 .messages {
-    padding: 10px;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-right: 10px;
 }
 .sql-view-editor {
     display: flex;
