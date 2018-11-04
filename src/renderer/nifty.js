@@ -102,6 +102,7 @@ export class Nifty {
             },
             resultsets: {}
         });
+        Vue.set(state.tab[key], 'queryKey', queryKey);
         var query = state.query[queryKey];
         console.log('QQ', queryKey, query);
         Vue.set(query.result, 'resultsets', {});
@@ -145,7 +146,6 @@ export class Nifty {
             query.msg = 'Statement failed with errors.';
         })
         .finally(function() {
-            Vue.set(state.tab[key], 'queryKey', queryKey);
             Vue.set(query, 'executing', false);
             Vue.set(query.result, 'hide', false);
             console.log(query);

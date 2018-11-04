@@ -1,7 +1,9 @@
 <template>
     <div class="tabs-component">
         <ul v-for="(t, i) in tabs">
-            <li @click="selectTab(t.key)" v-bind:class="{ active: selectedTabKey == t.key }">{{ t.name }}<div>⌘{{ i + 1 }}</div></li>
+            <li @click="selectTab(t.key)" v-bind:class="{ active: selectedTabKey == t.key }">{{ t.name }}<div>⌘{{ i + 1 }}</div>
+                <img :class="{ hidden: !($store.state.query[ $store.state.tab[t.key].queryKey ] || {}).executing }" id="logo" style="margin-left: 4px; margin-right: -2px; margin-top: -4px;" :width="12" :height="12" ref="logo" :src="require(`@/assets/8.gif`)" alt="electron-vue">
+        </li>
         </ul>
     </div>
 </template>
@@ -40,6 +42,50 @@ export default {
 </script>
 
 <style scoped>
+.hidden {
+    display: none;
+}
+.spinner {
+  width: 10px;
+  height: 10px;
+
+  position: relative;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #333;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bounce {
+  0%, 100% {
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% {
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
+
     .tabs-component {
         background: #f4f4f4;
         height: 28px;

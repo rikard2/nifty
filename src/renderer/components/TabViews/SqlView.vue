@@ -4,7 +4,7 @@
             <div>
                 <toolbar>
                     <toolbar-item icon="play" command="execute-query" size="12" :disabled="query && query.executing"></toolbar-item>
-                    <toolbar-item icon="stop" command="stop-query" size="10" :disabled="query && !query.executing"></toolbar-item>
+                    <toolbar-item icon="stop" command="stop-query" size="10" :disabled="!query || !query.executing"></toolbar-item>
                 </toolbar>
             </div>
             <div style="flex: 1 auto;width: 100%;height: 100%;">
