@@ -1,7 +1,7 @@
 <template>
     <div class="tabs-component">
-        <ul v-for="(tab, i) in $store.state.tabs">
-            <li @click="selectTab(tab, i)" v-bind:class="{ active: $store.state.activeTab.index == i }">{{ tab.name }}<div>⌘{{ i + 1 }}</div></li>
+        <ul v-for="(t, i) in tabs">
+            <li @click="selectTab(t.key)" v-bind:class="{ active: selectedTabKey == t.key }">{{ t.name }}<div>⌘{{ i + 1 }}</div></li>
         </ul>
     </div>
 </template>
@@ -14,15 +14,26 @@ export default {
     name: 'tabs',
     components: {
     },
-    mounted: function() {
-        if (this.$store.state.tabs.length > 1) {
-            var firstTab = this.$store.state.tabs[1];
-            this.selectTab(firstTab);
+    computed: {
+        tabs: function() {
+            var state = this.$store.state;
+            return Object.keys(state.tab).map(function(key) {
+                return {
+                    key: key,
+                    name: state.tab[key].name
+                };
+            });
+        },
+        selectedTabKey: function() {
+            return this.$store.state.selectedTabKey;
         }
     },
+    mounted: function() {
+    },
     methods: {
-        selectTab(tab, index) {
-            Vue.set(this.$store.state.activeTab, 'index', index);
+        selectTab(key) {
+            var state = this.$store.state;
+            state.selectTab(key);
         }
     }
 }

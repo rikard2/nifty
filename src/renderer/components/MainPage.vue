@@ -9,18 +9,18 @@
     </div>
 -->
     <div class="main-wrapper">
-        <div class="left-side" style="overflow-x: hidden; flex-basis: 175px;" v-resize="{ direction: 'horizontal' }">
+        <div class="left-side" style="overflow-x: hidden; flex-basis: 250px;" v-resize="{ direction: 'horizontal' }">
             <tree-view></tree-view>
         </div>
         <div class="main-side">
             <div class="main-tabs">
                 <tabs></tabs>
             </div>
-            <div v-if="$store.state.activeTab.index >= 0" class="main-tab-view" :key="$store.state.tabs[$store.state.activeTab.index].name">
-                <div v-if="$store.state.tabs[$store.state.activeTab.index].type == 'sql'" class="fill">
-                    <sqlview index="" v-model="$store.state.tabs[$store.state.activeTab.index]"></sqlview>
+            <div v-if="$store.state.selectedTabKey" class="main-tab-view" :key="$store.state.selectedTabKey">
+                <div v-if="$store.state.tab[$store.state.selectedTabKey].type == 'sql'" class="fill">
+                    <sqlview index="" v-model="$store.state.tab[$store.state.selectedTabKey]"></sqlview>
                 </div>
-                <div v-if="$store.state.tabs[$store.state.activeTab.index].type == 'settings'" class="fill">
+                <div v-if="$store.state.tab[$store.state.selectedTabKey].type == 'settings'" class="fill">
                     <settingsview></settingsview>
                 </div>
             </div>

@@ -80,7 +80,6 @@ export class DB {
             });
 
             client.query(query, (err, res) => {
-                console.log('err', err);
                 if (err) return reject(err);
                 console.log('res', res);
                 var result = { resultsets: [] };
@@ -100,7 +99,6 @@ export class DB {
                     });
                 }
                 result.notices = notices;
-                console.log('notices', notices);
                 resolve(result);
             });
         });
