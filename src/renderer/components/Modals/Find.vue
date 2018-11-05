@@ -24,26 +24,47 @@ export default {
     computed: {
         results: function() {
             var index = this.value.index;
+            //index = [
+            //    { filename: '/users/public/schema/deposit.sql' },
+            //    { filename: '/users/hej.sql' }
+            //];
             var search = function(searchText) {
+                var searches = searchText.toLowerCase().split(/(\s+)/);
                 var found = [];
 
                 found = index.map(function(ix) {
-                    var srch = (searchText || '').toLowerCase();
-                    var searchRegexes = [
-                        { points: 9, r: new RegExp('/' + srch) }
-                    ];
-                    for (var i = 0; i < ix.matches.length; i++) {
-                        if (ix.matches[i] && ix.matches[i].indexOf(srch) >= 0) {
-                            return {
-                                'title': ix.filename
-                            };
+                    var points = 0;
+                    for (var i = 0; i < searches.length; i++) {
+                        if (searches[i].trim().length == 0) continue;
+                        var io_filename = (ix.filename.indexOf('/' + searches[i] + '.'));
+                        var io_slash = (ix.filename.indexOf('/' + searches[i]));
+                        var io_fuzzy = (ix.filename.indexOf(searches[i]));
+                        if (io_filename >= 0) {
+                            points = points + 3;
+                        } else if (io_slash >= 0) {
+                            points = points + 2;
+                        } else if (io_fuzzy >= 0) {
+                            points = points + 1;
                         }
+                    }
+
+                    if (points > 0) {
+                        return {
+                            'title': ix.filename,
+                            'filename': ix.filename,
+                            'points': points
+                        };
                     }
                 })
                 .filter(function(f) { return f; });
 
-                found.sort(function(a, b) { return (a.points > b.points) ? 1 : -1; });
+                found.sort(function(a, b) {
+                    if (a.points == b.points) {
+                        return a.filename > b.filename ? 1 : -1
+                    }
 
+                    return (a.points > b.points) ? -1 : 1;
+                });
                 return found.slice(0, 7);
             };
             return search(this.$data.searchtext);
@@ -63,18 +84,24 @@ export default {
         var search = function(searchText) {
             var found = [];
 
+            var searches = searchText.toLowerCase().split(/(\s+)/);
+            console.log(searches);
             found = index.map(function(ix) {
-                var srch = searchText.toLowerCase();
-                var searchRegexes = [
-                    new Regex('/' + srch + '$')
-                ];
-                for (var i = 0; i < searchRegexes.length; i++) {
-                    if (searchRegexes[i].test(ix.filename) && false) {
-                        return {
-                            'title': ix.filename
-                        };
+                var points = 0;
+                for (var i = 0; i < searches.length; i++) {
+                    if (ix.filename.indexOf(searches[i]) >= 0) {
+                        points = points + 1;
                     }
                 }
+
+                if (points > 0) {
+                    return {
+                        'title': ix.filename
+                    };
+                }
+            })
+            .sort(function(a, b) {
+                return a.points > b.points ? 1 : -1;
             });
 
             return found;

@@ -30,11 +30,8 @@ export class Nifty {
                 if (d.type == 'file') {
                     var filename = d.path.toLowerCase();
                     index.push({
-                        filename: filename,
-                        matches: regexes.map(function(re) {
-                            var x = re.re.exec(filename);
-                            return x ? x[1] : null;
-                        })
+                        title: filename,
+                        filename: filename
                     });
                 }
                 else if (d.type == 'directory' && ignoreDirectories.indexOf(d.name) === -1) {
@@ -176,7 +173,6 @@ export class Nifty {
         .finally(function() {
             Vue.set(query, 'executing', false);
             Vue.set(query.result, 'hide', false);
-            console.log(query);
         });
     }
 
@@ -210,14 +206,14 @@ export class Nifty {
     }
 
     async find() {
-        var vm = this.vm;
+        var state = this.vm.$store.state;
         var openFile = function(path) {
             var fs = require('fs');
 
             fs.readFile(path, 'utf8', function(err, contents) {
                 if (!err) {
                     var filename = path.replace(/^.*[\\\/]/, '');
-                    vm.$store.state.tabs.push({
+                    var key = state.newTab({
                         name: filename,
                         type: 'sql',
                         viewstate: {
@@ -230,8 +226,8 @@ export class Nifty {
                             }
                         }
                     });
-                    vm.$store.state.filename = path;
-                    vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
+                    state.selectTab(key);
+                    state.filename = path;
                 }
             });
         }
@@ -239,7 +235,9 @@ export class Nifty {
         var index = this.vm.$store.state.index;
         var lookup = await Modal.show('Find', { index: index }).
         then(function(selected) {
-            openFile(selected.title);
+            if (selected) {
+                openFile(selected.filename);
+            }
         });
     }
     async lookup() {

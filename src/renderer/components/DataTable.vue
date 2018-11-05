@@ -43,7 +43,7 @@ export default {
         value: function(n, o) {
             this.$root.nifty.activeDataTable = this.dt;
             this.dt.setData(n);
-            this.dt.focus();
+            //this.dt.focus();
         }
     }
 }
