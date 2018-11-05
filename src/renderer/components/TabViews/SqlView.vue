@@ -3,47 +3,47 @@
         <div class="sql-view-editor">
             <div>
                 <toolbar>
-                    <toolbar-item icon="play" command="execute-query" size="12" :disabled="value.viewstate.executing"></toolbar-item>
-                    <toolbar-item icon="stop" command="stop-query" size="10" :disabled="!value.viewstate.executing"></toolbar-item>
+                    <toolbar-item icon="play" command="execute-query" size="12" :disabled="query && query.executing"></toolbar-item>
+                    <toolbar-item icon="stop" command="stop-query" size="10" :disabled="!query || !query.executing"></toolbar-item>
                 </toolbar>
             </div>
             <div style="flex: 1 auto;width: 100%;height: 100%;">
                 <editor :content="value.viewstate.content" v-on:change="editorchange"></editor>
             </div>
         </div>
-        <div v-if="!value.viewstate.result.hide" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
-            <div v-if="value.viewstate.executing" style="font-size: 12px;margin-top: 30px;font-weight: normal;">
+        <div v-if="query && !query.result.hide" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
+            <div v-if="query.executing" style="font-size: 12px;margin-top: 30px;font-weight: normal;">
                 Loading...
             </div>
-            <div class="resultset-tab" v-if="!value.viewstate.executing && value.viewstate.result.resultsets && value.viewstate.result.resultsets.length > 0">
-                <ul v-for="(r, i) in value.viewstate.result.resultsets">
-                    <li @click="tabClick(i)" :class="{ active: i == value.viewstate.selected }">{{ r.label }}</li>
+            <div class="resultset-tab" v-if="!query.executing && Object.keys(query.result.resultsets).length > 0">
+                <ul v-for="(key, i) in Object.keys(query.result.resultsets)">
+                    <li @click="tabClick(key)" :class="{ active: key == query.result.selectedResultsetKey }">{{ query.result.resultsets[key].label }}</li>
                 </ul>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected >= 0 && value.viewstate.result.resultsets[value.viewstate.selected] && !value.viewstate.result.resultsets[value.viewstate.selected].notices">
-                <data-table v-model="value.viewstate.result.resultsets[value.viewstate.selected]"></data-table>
+            <div style="flex: 1 auto;position: relative;" v-if="query.result.selectedResultsetKey && query.result.resultsets[query.result.selectedResultsetKey] && !query.result.resultsets[query.result.selectedResultsetKey].notices">
+                <data-table v-model="query.result.resultsets[query.result.selectedResultsetKey]"></data-table>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.selected == 0 && value.viewstate.result.resultsets[value.viewstate.selected] && value.viewstate.result.resultsets[value.viewstate.selected].notices">
-                <div v-for="n in value.viewstate.result.resultsets[value.viewstate.selected].notices" class="messages">
+            <div style="flex: 1 auto;position: relative;" v-if="query.result.resultsets[query.result.selectedResultsetKey] && query.result.resultsets[query.result.selectedResultsetKey].notices">
+                <div v-for="n in query.result.resultsets[query.result.selectedResultsetKey].notices" class="messages">
                     <pre class="statusmessage">
                         <span class="runtime_instant">{{ n.severity }}</span>
                         <span class="message">{{ n.text || n.count }}</span>
                     </pre>
                 </div>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="value.viewstate.error">
-                <pre class="errormessage">{{ value.viewstate.error }}</pre>
+            <div style="flex: 1 auto;position: relative;" v-if="query.error">
+                <pre class="errormessage">{{query.error }}</pre>
             </div>
-            <div class="resultset-toolbar" v-if="!value.viewstate.executing">
+            <div class="resultset-toolbar" v-if="!query.executing">
                 <div class="sql-view-status">
-                    <div v-if="!value.viewstate.error">
+                    <div v-if="!query.error">
                         <img style="float: left;padding-top: 3px;height: 16px;width: 16px;" :width="24" :height="24" ref="logo" :src="require(`@/assets/icons/checked.svg`)" alt="electron-vue">
-                        <div class="msg">{{ value.viewstate.msg }}</div>
+                        <div class="msg">{{ query.msg }}</div>
                         <div style="clear:both"></div>
                     </div>
-                    <div v-if="value.viewstate.error">
+                    <div v-if="query.error">
                         <img style="float: left;padding-top: 3px;height: 16px;width: 16px;" :width="24" :height="24" ref="logo" :src="require(`@/assets/icons/error.svg`)" alt="electron-vue">
-                        <div class="msg">{{ value.viewstate.msg }}</div>
+                        <div class="msg">{{ query.msg }}</div>
                         <div style="clear:both"></div>
                     </div>
                 </div>
@@ -70,11 +70,24 @@ export default {
         resize: ResizeDirective
     },
     events: ['editorchange'],
-    data() {
-        return {
-            filename: this.$store.state.filename,
-            viewstate: this.$store.state.tabs[this.$store.state.activeTab.index].viewstate
-        };
+    computed: {
+        viewstate: function() {
+            return this.$store.state.tab[this.$store.state.selectedTabKey].viewstate;
+        },
+        queryResultsets: function() {
+            var queryKey = this.$store.state.tab[this.$store.state.selectedTabKey].viewstate.queryKey;
+
+            return Object.keys(this.$store.state.query[queryKey].result.resultsets).map(function(key) {
+                return {
+                    key: key,
+                    name: 'asd'
+                };
+            });
+        },
+        query: function() {
+            var queryKey = this.$store.state.tab[this.$store.state.selectedTabKey].viewstate.queryKey;
+            return this.$store.state.query[queryKey]
+        },
     },
     filters: {
         pretty: function(value) {
@@ -92,8 +105,8 @@ export default {
         blazingGrid: BlazingGrid
     },
     methods: {
-        tabClick: function(i) {
-            this.value.viewstate.selected = i;
+        tabClick: function(key) {
+            Vue.set(this.query.result, 'selectedResultsetKey', key);
         },
         editorchange: function(c) {
             this.value.viewstate.content = c;
@@ -107,7 +120,6 @@ export default {
     width: 100%;
     text-align: left;
     padding: 5px;
-    border-bottom: 1px solid #e0e0e0;
     background: #fafafa;
 }
 .disabled {
@@ -226,7 +238,6 @@ sql-view-status div.sep {
     border-top: 1px solid #e0e0e0;
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: 30px;
 }
 .resultset-tab ul {
     font-size: 14px;

@@ -14,6 +14,7 @@ export class Nifty {
 
     constructor(vm) {
         this.vm = vm;
+        var state = this.vm.$store.state;
         console.info('Load of nifty');
 
         const dirTree = require('directory-tree');
@@ -60,7 +61,7 @@ export class Nifty {
             dis.send.apply(dis, [ msg.command, msg.payload ]);
         });
         this.on('new', () => {
-            vm.$store.state.tabs.push({
+            var key = state.newTab({
                 name: 'Untitled',
                 type: 'sql',
                 viewstate: {
@@ -73,48 +74,25 @@ export class Nifty {
                     }
                 }
             });
-            vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
+            state.selectTab(key);
         });
         this.on('settings', () => {
-            vm.$store.state.tabs.push({
+            var key = state.newTab({
                 name: 'Settings',
-                type: 'settings',
-                viewstate: {
-                }
+                type: 'settings'
             });
-            vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
+            state.selectTab(key);
         });
         this.on('lookup', async () => await this.lookup.apply(dis));
         this.on('find', async () => await this.find.apply(dis));
         this.on('previous-tab', () => {
-            var newIndex = vm.$store.state.activeTab.index - 1;
-            if (newIndex < 0) {
-                newIndex = 0;
-            }
-            if (vm.$store.state.tabs.length == 0) {
-                newIndex = -1;
-            }
-            vm.$store.state.activeTab.index = newIndex;
+            state.selectPreviousTab();
         });
         this.on('next-tab', () => {
-            var newIndex = vm.$store.state.activeTab.index + 1;
-            if (newIndex >= vm.$store.state.tabs.length) {
-                newIndex = vm.$store.state.tabs.length - 1;
-            }
-            if (vm.$store.state.tabs.length == 0) {
-                newIndex = -1;
-            }
-            vm.$store.state.activeTab.index = newIndex;
+            state.selectNextTab();
         });
         this.on('close-tab', () => {
-            var index = vm.$store.state.activeTab.index;
-            vm.$store.state.tabs.splice(index, 1);
-            var newIndex = vm.$store.state.activeTab.index - 1;
-            if (newIndex < 0) newIndex = 0;
-            if (vm.$store.state.tabs.length == 0) {
-                newIndex = -1;
-            }
-            Vue.set(vm.$store.state.activeTab, 'index', newIndex);
+            state.closeTab(state.selectedTabKey);
         });
         this.on('execute-selected-query', async () => {
             var index = vm.$store.state.activeTab.index;
@@ -130,63 +108,86 @@ export class Nifty {
             }
         });
         this.on('execute-query', async () => {
-            var index = vm.$store.state.activeTab.index;
-            var content = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.content;
+            console.log('EXECUTE QUERY');
+            var state = vm.$store.state;
+            var content = state.tab[state.selectedTabKey].viewstate.content;
             await this.executeQuery(this.vm, content);
         });
     }
 
     async executeQuery(vm, content) {
         var connection = await this.getTabConnection(vm);
-        vm.$store.state.tabs[vm.$store.state.activeTab.index].connection = connection;
-        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = false;
-        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.selected = -1;
-        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets = [];
-        vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = true;
+        var state = vm.$store.state;
 
+        var key = state.selectedTabKey;
+        var queryKey = state.newQuery(connection);
+        Vue.set(state.tab[key], 'connection', connection);
+        Vue.set(state.tab[key].viewstate, 'queryKey', queryKey);
+        Vue.set(state.query, queryKey, {
+            executing: true,
+            result: {
+                hide: false
+            },
+            resultsets: {}
+        });
+        Vue.set(state.tab[key], 'queryKey', queryKey);
+        var query = state.query[queryKey];
+        console.log('QQ', queryKey, query);
+        Vue.set(query.result, 'resultsets', {});
         await vm.nifty.db.queryAsync(connection, content)
         .then(function(result) {
             if (result.notices && result.notices.length) {
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push({
+                var resultsetKey = require('uniqid')();
+                query.result.resultsets[resultsetKey] = {
                     label: 'Notices',
                     notices: result.notices
-                });
+                };
             }
             result.resultsets.forEach((r, i) => {
+                var resultsetKey = require('uniqid')();
                 if (r.rowCount == undefined) return;
                 r.label = 'Result #' + (i + 1);
                 r.resultset = true;
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.push(r);
+                Vue.set(query.result.resultsets, resultsetKey, r);
 
             });
-            var resultsetCount = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result.resultsets.length;
+
+            if (Object.keys(query.result.resultsets).length == 1) {
+                Vue.set(query.result, 'selectedResultsetKey', Object.keys(query.result.resultsets)[0]);
+            } else {
+                if (Object.keys(query.result.resultsets).length > 1) {
+                    Vue.set(query.result, 'selectedResultsetKey', Object.keys(query.result.resultsets)[1]);
+                }
+            }
+
+            var resultsetCount = Object.keys(query.result.resultsets).length;
             if (resultsetCount == 1) {
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Statement run successfully.';
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.selected = 0;
+                Vue.set(query, 'msg', 'Statement run successfully.');
+                Vue.set(query, 'selected', 0);
             } else if (resultsetCount > 1) {
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Query run successfully.';
-                vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.selected = 1;
+                Vue.set(query, 'msg', 'Query run successfully.');
+                Vue.set(query, 'selected', 1);
             }
         })
         .catch(function(err) {
-            console.log('cauthyt', err.message);
-            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.error = err.message;
-            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.msg = 'Statement failed with errors.';
+            query.error = err.message;
+            query.msg = 'Statement failed with errors.';
         })
         .finally(function() {
-            vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.executing = false;
-            Vue.set(vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.result, 'hide', false);
+            Vue.set(query, 'executing', false);
+            Vue.set(query.result, 'hide', false);
+            console.log(query);
         });
     }
 
     async getTabConnection(vm) {
-        var connection = (this.getActiveTab() || {}).connection;
-        var config = vm.$store.state.config;
+        var state = vm.$store.state;
+        var connection = (state.tab[state.selectedTabKey] || {}).connection;
 
         if (!connection) {
-            connection = await Modal.choices(Object.keys(config.connections).map(function(alias) {
+            connection = await Modal.choices(Object.keys(state.config.connections).map(function(alias) {
                 return {
-                    label: config.connections[alias].name,
+                    label: state.config.connections[alias].name,
                     value: alias
                 };
             }));

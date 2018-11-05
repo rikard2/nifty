@@ -16,38 +16,8 @@ export default {
     name: 'tree-view',
     data() {
         return {
-
-            folders: this.$store.state.folders,
-            treeData: {
-              name: 'My Tree!!!',
-              children: [
-                { name: 'hello' },
-                { name: 'wat' },
-                {
-                  name: 'child folder',
-                  children: [
-                    {
-                      name: 'child folder',
-                      children: [
-                        { name: 'hello' },
-                        { name: 'wat' }
-                      ]
-                    },
-                    { name: 'hello' },
-                    { name: 'wat' },
-                    {
-                      name: 'child folder',
-                      children: [
-                        { name: 'hello' },
-                        { name: 'wat' }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-
-        };
+            folders: this.$store.state.folders
+        }
     },
     components: {
         treeViewItem: TreeViewItem
@@ -56,7 +26,6 @@ export default {
     }
 }
 </script>
-
 <style scoped>
     .tree-view {
         font-size: 14px;

@@ -95,15 +95,9 @@ module.exports = {
 
         editor.setValue(this.value,1);
         this.contentBackup = this.value;
+        editor.focus();
+        editor.navigateFileEnd();
 
-        var fs = require('fs')
-        fs.readFile('/Users/rikard/hej.sql', 'utf8', function (err,data) {
-
-          if (err) {
-            return console.log(err);
-          }
-          //editor.setValue(data, 1);
-        });
         require("brace/ext/language_tools");
         var langTools = ace.acequire("ace/ext/language_tools");
 

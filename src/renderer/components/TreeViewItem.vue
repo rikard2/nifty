@@ -79,17 +79,17 @@ export default {
             })
         },
         openFile() {
+            var state = this.$store.state;
             if (!this.model.children) {
                 var path = this.model.path;
                 var fs = require('fs');
-                var vm = this;
 
                 fs.readFile(path, 'utf8', function(err, contents) {
                     if (!err) {
                         var filename = path.replace(/^.*[\\\/]/, '');
-                        vm.$store.state.tabs.push({
+                        var key = state.newTab({
                             name: filename,
-                            type: 'sql',
+                            path: path,
                             viewstate: {
                                 content: contents,
                                 selected: -1,
@@ -100,8 +100,7 @@ export default {
                                 }
                             }
                         });
-                        vm.$store.state.filename = path;
-                        vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
+                        state.selectTab(key);
                     }
                 });
             }

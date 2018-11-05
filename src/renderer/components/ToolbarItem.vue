@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="icon">
-            <img id="logo" @click="click" :class="{ disabled: this.disabled || false }" :width="this.size || 24" :height="this.size || 24" ref="logo" :src="require(`@/assets/icons/` + this.icon + `.svg`)" alt="electron-vue">
+            <img id="logo" @mousedown="click" :class="{ disabled: this.disabled || false }" :width="this.size || 24" :height="this.size || 24" ref="logo" :src="require(`@/assets/icons/` + this.icon + `.svg`)" alt="electron-vue">
         </div>
         <div class="sep"></div>
     </div>
@@ -23,6 +23,7 @@ export default {
     },
     methods: {
         click: function() {
+            console.log('SENDING', this.command);
             this.$root.nifty.send(this.command);
         }
     }
