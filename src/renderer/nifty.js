@@ -17,7 +17,33 @@ export class Nifty {
         console.info('Load of nifty');
 
         const dirTree = require('directory-tree');
-        const tree = dirTree('/users/rikard/nifty/sql_test');
+        var ignoreDirectories = ['.git', '.idea'];
+        var ignoreFiles = ['.git', '.idea'];
+        const tree = dirTree('/users/rikard/git/trustly/schema');
+        var index = [];
+        var regexes = [
+            { points: 9, re: new RegExp('/([a-z0-9_]+)[.]') }
+        ];
+        var flatten = function(directory) {
+            directory.forEach(function(d) {
+                if (d.type == 'file') {
+                    var filename = d.path.toLowerCase();
+                    index.push({
+                        filename: filename,
+                        matches: regexes.map(function(re) {
+                            var x = re.re.exec(filename);
+                            return x ? x[1] : null;
+                        })
+                    });
+                }
+                else if (d.type == 'directory' && ignoreDirectories.indexOf(d.name) === -1) {
+                    flatten(d.children);
+                }
+            });
+        };
+        flatten(tree.children);
+        console.log(index);
+
         if (tree) {
             vm.$store.state.folders = [
                 {
@@ -26,6 +52,7 @@ export class Nifty {
                 }
             ];
         }
+        vm.$store.state.index = index;
 
         this.db = new (require('./nifty/db').DB)(vm);
         var dis = this;
@@ -58,6 +85,7 @@ export class Nifty {
             vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
         });
         this.on('lookup', async () => await this.lookup.apply(dis));
+        this.on('find', async () => await this.find.apply(dis));
         this.on('previous-tab', () => {
             var newIndex = vm.$store.state.activeTab.index - 1;
             if (newIndex < 0) {
@@ -180,6 +208,39 @@ export class Nifty {
         return null;
     }
 
+    async find() {
+        var vm = this.vm;
+        var openFile = function(path) {
+            var fs = require('fs');
+
+            fs.readFile(path, 'utf8', function(err, contents) {
+                if (!err) {
+                    var filename = path.replace(/^.*[\\\/]/, '');
+                    vm.$store.state.tabs.push({
+                        name: filename,
+                        type: 'sql',
+                        viewstate: {
+                            content: contents,
+                            selected: -1,
+                            executing: false,
+                            result: {
+                                hide: true,
+                                resultsets: []
+                            }
+                        }
+                    });
+                    vm.$store.state.filename = path;
+                    vm.$store.state.activeTab.index = vm.$store.state.tabs.length - 1;
+                }
+            });
+        }
+
+        var index = this.vm.$store.state.index;
+        var lookup = await Modal.show('Find', { index: index }).
+        then(function(selected) {
+            openFile(selected.title);
+        });
+    }
     async lookup() {
         var connection = await this.getTabConnection(this.vm);
         var config = this.vm.$store.state.config;

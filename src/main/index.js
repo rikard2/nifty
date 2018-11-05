@@ -125,6 +125,15 @@ const template = [
                 }
             },
             {
+                label: 'Find',
+                accelerator: 'Cmd+P',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'find'
+                    });
+                }
+            },
+            {
                 label: 'Execute Selected Query',
                 accelerator: 'Cmd+Shift+Enter',
                 click() {
