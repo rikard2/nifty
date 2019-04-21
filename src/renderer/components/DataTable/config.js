@@ -24,12 +24,18 @@ export default {
         },
         cell: {
             style: {
+                'background': 'none',
                 'font-family': 'helvetica',
                 'font-weight': 'normal',
                 'font-size': '12px',
                 'text-align': 'left',
                 'overflow': 'hidden',
                 'border-right': '1px solid #f0f0f0'
+            }
+        },
+        cell_selected: {
+            style: {
+                'background': 'rgb(210, 236, 255)'
             }
         }
     },

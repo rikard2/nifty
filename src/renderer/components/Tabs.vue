@@ -1,10 +1,9 @@
 <template>
-    <div class="tabs-component">
+    <div class="tabs-component" v-if="tabs.length > 0">
         <ul >
             <li v-for="(t, i) in tabs" @click="selectTab(t.key)" v-bind:class="{ active: selectedTabKey == t.key }">{{ t.name }}<div>⌘{{ i + 1 }}</div>
                 <img :class="{ hidden: !($store.state.query[ $store.state.tab[t.key].queryKey ] || {}).executing }" id="logo" style="margin-left: 4px; margin-right: -2px; margin-top: -4px;" :width="12" :height="12" ref="logo" :src="require(`@/assets/8.gif`)" alt="electron-vue">
         </li>
-        <li>+</li>
         </ul>
     </div>
 </template>

@@ -56,20 +56,35 @@ export class DB {
     }
 
     async queryAsync(alias, query) {
+        var state = this.vm.$store.state;
+
         var conf = this.config['connections'][alias];
         if (!conf) throw('No available config');
 
-        var client = new Client({
-            connectionString: conf.url
-        });
-        client.connect();
+        var client = state.connections[alias];
+
+        if (!client) {
+            client = state.connections[alias] = new Client({
+                connectionString: conf.url
+            });
+            console.log('connecting');
+            try {
+                client.connect();
+            } catch(err) {
+                connect.err('Failed connect', err);
+            }
+            console.log('connecting...done');
+        }
+
         var result = await this.clientQuery(client, query);
         return result;
     }
     async clientQuery(client, query) {
         var dis = this;
+        console.log('before prom');
         return new Promise((resolve, reject) => {
             var notices = [];
+            console.log('2');
             client.on('notice', function(notice, b) {
                 var n = {
                     severity: notice.severity,
@@ -78,10 +93,14 @@ export class DB {
                 notices.push(n);
                 console.log('notice', n);
             });
+            console.log('3');
 
             client.query(query, (err, res) => {
-                if (err) return reject(err);
-                console.log('res', res);
+                console.log('4');
+                if (err) {
+                    console.error('rejecting', err);
+                    return reject(err);
+                }
                 var result = { resultsets: [] };
                 if (Array.isArray(res)) {
                     result.resultsets = res.map((r) => {
@@ -106,7 +125,7 @@ export class DB {
     query(alias, query) {
         var conf = this.config['connections'][alias];
         if (!conf) {
-            throw('No available config');
+            throw('NO_AVAILABLE_CONFIG');
         }
 
         var client = new Client({

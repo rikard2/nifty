@@ -8,20 +8,7 @@
           </ul>
         </div>
         <div class="settings-content">
-          <div v-for="(setting) in settings[selectedCategory]">
-            <div><h2>{{ setting['title'] }}</h2></div>
-            <div v-if="setting['type'] == 'list'">
-              <div class="list">
-                <ul>
-                    <li>Tomte</li>
-                    <li class="active">Tomte</li>
-                    <li>Tomte</li>
-                </ul>
-                <button>Add</button>
-                <button>Remove</button>
-              </div>
-            </div>
-          </div>
+            connections: {{ Object.keys($store.state.connections) }}
         </div>
     </div>
 </template>

@@ -7,6 +7,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+        connections: {},
         settings: {
             'General': {
             },
@@ -16,14 +17,14 @@ export default new Vuex.Store({
                     'type': 'list',
                     'value': [
                         {
-                            'name': 'Local',
-                            'group': 'trustly',
-                            'url': 'postgres://127.0.0.1:5432/rikardjavelind'
-                        },
-                        {
                             'name': 'Vagrant',
                             'group': 'trustly',
                             'url': 'postgres://vagrant@192.168.56.125:5432/vagrant'
+                        },
+                        {
+                            'name': 'Local',
+                            'group': 'trustly',
+                            'url': 'postgres://127.0.0.1:5432/rikardjavelind'
                         }
                     ]
                 }

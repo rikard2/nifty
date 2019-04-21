@@ -37,6 +37,15 @@ const template = [
                 }
             },
             {
+                label: 'Save',
+                accelerator: 'Cmd+S',
+                click() {
+                    mainWindow.webContents.send('command', {
+                        command: 'save'
+                    });
+                }
+            },
+            {
                 label: 'Close tab',
                 accelerator: 'Cmd+W',
                 click() {
@@ -82,6 +91,18 @@ const template = [
                 }
             }
         ]
+    },
+    {
+        label: 'Tabs',
+        submenu: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function(n) {
+            return {
+                label: 'CMD+' + n,
+                accelerator: 'Cmd+' + n,
+                click() {
+                    mainWindow.webContents.send('command', { command: 'tab', payload: n });
+                }
+            }
+        })
     },
     {
         label: 'Edit',

@@ -23,7 +23,7 @@
             <div style="flex: 1 auto;position: relative;" v-if="query.result.selectedResultsetKey && query.result.resultsets[query.result.selectedResultsetKey] && !query.result.resultsets[query.result.selectedResultsetKey].notices">
                 <data-table v-model="query.result.resultsets[query.result.selectedResultsetKey]"></data-table>
             </div>
-            <div style="flex: 1 auto;position: relative;" v-if="query.result.resultsets[query.result.selectedResultsetKey] && query.result.resultsets[query.result.selectedResultsetKey].notices">
+            <div style="flex: 1 auto;position: relative;overflow: scroll;margin-bottom: 10px;" v-if="query.result.resultsets[query.result.selectedResultsetKey] && query.result.resultsets[query.result.selectedResultsetKey].notices">
                 <div v-for="n in query.result.resultsets[query.result.selectedResultsetKey].notices" class="messages">
                     <pre class="statusmessage">
                         <span class="runtime_instant">{{ n.severity }}</span>

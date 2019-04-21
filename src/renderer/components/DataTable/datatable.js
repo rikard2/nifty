@@ -1,13 +1,13 @@
 export class DataTable {
-    config = require('./config.js').default
-    helper = require('./helper.js').default
-    selection = new (require('./selection.js').SelectionManager)();
-    keyDownListener = null;
-
-    escape = function() {};
-    onFocus = function() {};
-
     constructor(rootElement) {
+        this.config = require('./config.js').default;
+        this.helper = require('./helper.js').default;
+        this.selection = new (require('./selection.js').SelectionManager)();
+        this.keyDownListener = null;
+
+        this.escape = function() {};
+        this.onFocus = function() {};
+
         this.rootElement = rootElement;
         this.create();
         var dis = this;
@@ -33,7 +33,7 @@ export class DataTable {
         this.focus();
     }
 
-    onCellActive(x, y) {
+    onCellActive(x, y) {
         var w = 0;
         for (var i = 0; i < x + 1; i++) {
             w += this.getColumn(i).width;
@@ -85,7 +85,6 @@ export class DataTable {
     }
 
     setData(data) {
-        this.create();
         this.data = data;
         for (var i = 0; i < this.data.columns.length; i++) {
             this.data.columns[i].width = this.getColumnWidth(i);
@@ -147,7 +146,7 @@ export class DataTable {
             border: 5px solid #FFF;
         }
         .copyFlash {
-            animation: fadeinout 200ms linear forwards;
+            animation: fadeinout 800ms linear forwards;
         }
         @keyframes fadeinout {
           0% { background: #007a99; opacity: 0.7; }
@@ -162,12 +161,14 @@ export class DataTable {
 
         holders.innerContainer = document.createElement('div')
         holders.innerContainer.style.display = 'flex';
+        holders.innerContainer.className = 'dataview-inner_container';
         holders.innerContainer.style['flex-direction'] = 'column';
         holders.innerContainer.style['cursor'] = 'default';
         holders.innerContainer.style.width = holders.innerContainer.style.height = '100%';
         holders.outerContainer.appendChild(holders.innerContainer);
 
         holders.columns = document.createElement('div')
+        holders.columns.className = 'dataview-columns';
         holders.columns.style['flex-basis'] = this.helper.px(this.config.column.height)
         holders.columns.style['position'] = 'relative';
         holders.columns.style['flex-grow'] = holders.columns.style['flex-shrink'] = '0'
@@ -177,8 +178,8 @@ export class DataTable {
         holders.columns_inner = document.createElement('div')
         holders.columns_inner.style['position'] = 'absolute';
         holders.columns_inner.style['top'] = '0px';
+        holders.columns_inner.className = 'dataview-columns_inner';
         holders.columns_inner.style['left'] = '0px';
-        holders.columns_inner.style['width'] = '10000px';
         holders.columns_inner.style['height'] = '100%';
         holders.columns.appendChild(holders.columns_inner);
 
@@ -186,6 +187,7 @@ export class DataTable {
 
         holders.belowcolumns = document.createElement('div')
         holders.belowcolumns.style.flex = '1 auto';
+        holders.belowcolumns.className = 'dataview-below_columns';
         holders.belowcolumns.style.display = 'flex';
         holders.belowcolumns.style['flex-direction'] = 'row';
         holders.belowcolumns.style['margin-top'] = this.helper.px(this.config.numbers.distance)
@@ -195,6 +197,7 @@ export class DataTable {
         holders.numbers = document.createElement('div')
         holders.numbers.style.height = '100%';
         holders.numbers.style.overflow = 'hidden';
+        holders.numbers.className = 'dataview-numbers';
         holders.numbers.style['flex-basis'] = this.helper.px(this.config.numbers.width);
         holders.numbers.style['flex-grow'] = holders.numbers.style['flex-shrink'] = '0'
         holders.numbers.style.float = 'left';
@@ -205,6 +208,7 @@ export class DataTable {
 
         holders.numbers_inner = document.createElement('div')
         //holders.numbers_inner.style.width = holders.numbers_inner.style.height = '100%';
+        holders.numbers_inner.className = 'dataview-numbers_inner';
         holders.numbers_inner.style.position = 'relative';
         holders.numbers_inner.style.width = '100%';
         holders.numbers_inner.style.top = holders.numbers_inner.style.left = '0px';
@@ -213,6 +217,7 @@ export class DataTable {
 
         holders.viewport = document.createElement('div')
         holders.viewport.style.width = '50px';
+        holders.viewport.className = 'dataview-viewport';
         holders.viewport.style.height = '100%';
         holders.viewport.style['margin-left'] = this.helper.px(this.config.numbers.distance);
         holders.viewport.style.flex = '1 auto';
@@ -235,12 +240,15 @@ export class DataTable {
 
     renderColumns() {
         this.holders.columns_inner.innerHTML = '';
+        var width = 0;
         this.data.columns.forEach((c, i) => {
             c.index = i;
+            width += c.width;
             var el = this.createColumn(c);
 
             this.holders.columns_inner.appendChild(el);
         });
+        this.holders.columns_inner.style['width'] = this.helper.px(width);
     }
 
     getColumn(n) {
@@ -270,6 +278,7 @@ export class DataTable {
         rowContainer.style.height   = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
         rowContainer.style['width'] = '100%';
+        rowContainer.className = 'dataview-row_container';
 
         var inside_div = document.createElement('div');
         inside_div.innerText = rowIndex + 1;
@@ -280,6 +289,7 @@ export class DataTable {
         inside_div.style['padding-top'] = '4px';
         inside_div.style['color'] = 'rgb(160, 160, 160)';
         inside_div.style['font-size'] = '12px';
+        inside_div.className = 'dataview-inside_div';
 
         rowContainer.appendChild(inside_div);
 
@@ -302,10 +312,13 @@ export class DataTable {
             width: this.holders.viewport.clientWidth,
             height: this.holders.viewport.clientHeight
         };
+
         var buffer = 100;
+        var minimumRows = 50;
         var first = Math.floor(visbleBox.top / this.config.row.height) - 5;
         var last = Math.ceil((visbleBox.top + visbleBox.height) / this.config.row.height) + 5;
         if (first < 0) first = 0;
+        if (first === 0 && last === 5) last = minimumRows;
         if (last >= this.data.rows.length) last = this.data.rows.length;
 
         this.rowCache = this.rowCache || {};
@@ -320,10 +333,12 @@ export class DataTable {
                 delete this.numbersCache[x];
             } else {
                 for (var i = 0; i < this.rowCache[x].children.length; i++) {
-                    this.rowCache[x].children[i].style.background = 'none';
+                    this.helper.apply(this.rowCache[x].children[i].style, this.config.column.cell.style);
+                    this.rowCache[x].children[i].className = this.rowCache[x].children[i].className.replace('selected', '');
                 }
             }
         }
+
         range.forEach(n => {
             if (!this.rowCache[n]) {
                 var nel = this.renderNumber(n);
@@ -350,7 +365,7 @@ export class DataTable {
         var initialClientX = null;
         var initalWidth = null;
         var dis = this;
-        var mouseDown = function(e) {
+        var mouseDown = function(e) {
             if (e.buttons == 1) {
                 dis.holders.viewport.onscroll = null;
                 offsetLeft = handle.offsetLeft;
@@ -372,11 +387,9 @@ export class DataTable {
                     dis.onViewportScroll.apply(dis);
                 };
             }
-            dis.renderColumns();
             dis.rowCache = {};
             var b = dis.holders.viewport.scrollLeft;
-            dis.holders.viewport_content.innerHTML = '';
-            dis.renderVisible();
+            dis.invalidate();
             dis.holders.viewport.scrollLeft = b;
         };
         handle.onmousedown = mouseDown;
@@ -399,7 +412,9 @@ export class DataTable {
             var len = (this.data.rows[i][columnIndex] || '').toString().length;
             if (len > max) max = len;
         }
+        if (col.label.length > max) max = col.label.length;
         var width = max * 10;
+        console.log('column', col.label, col.type, max, width);
         if (width > 200) return 300;
         if (width < 50) return 100;
         return width;
@@ -411,9 +426,9 @@ export class DataTable {
         rowContainer.style.height  = this.helper.px(this.config.row.height);
         rowContainer.style['border-bottom'] = '1px solid #f0f0f0';
         rowContainer.style['position'] = 'absolute';
-        rowContainer.style.width   = '100000px';
         rowContainer.style.height  = this.config.row.height + 'px';
         var dis = this;
+        var totalWidth = 0;
         row.map((value, colIndex) => {
             var column = this.getColumn(colIndex);
             var outer_div           = document.createElement('div');
@@ -430,25 +445,30 @@ export class DataTable {
             outer_div.style.height  = this.helper.px(this.config.row.height);
             outer_div.style.float   = 'left';
             outer_div.style.overflow   = 'hidden';
+            outer_div.className = 'dataview-outer_div';
             outer_div.style['border-right']   = '1px solid #f0f0f0';
             outer_div.style['text-align']   = 'left';
             var selected = dis.selection.isCellSelected(colIndex, rowIndex, selectionRanges);
             if (selected) {
                 if (dis.selection.copy) {
-                    outer_div.className = 'copyFlash';
+                    outer_div.className = 'dataview-outer_div copyFlash';
                 } else {
-                    outer_div.className = '';
+                    outer_div.className = 'dataview-outer_div';
                 }
-                outer_div.style['background'] = 'rgb(210, 236, 255)';
-            } else {
+                outer_div.className = outer_div.className + ' selected';
+                //outer_div.style['background'] = 'rgb(210, 236, 255)';
+                this.helper.apply(outer_div.style, this.config.column.cell_selected.style);
             }
-            outer_div.style.width   = this.helper.px(this.data.columns[colIndex].width);
+            var w = this.data.columns[colIndex].width;
+            outer_div.style.width   = this.helper.px(w);
+            totalWidth += w;
 
             var inside_div = document.createElement('div');
             inside_div.innerText = dis.formatCell(row[colIndex], column);
             inside_div.style['font-family'] = 'menlo';
             inside_div.style['font-weight'] = 'normal';
             inside_div.style['padding-left'] = '4px';
+            inside_div.className = 'dataview-inside_div';
             inside_div.style['padding-top'] = '4px';
             inside_div.style['font-size'] = '12px';
             inside_div.style['overflow'] = 'hidden';
@@ -460,6 +480,8 @@ export class DataTable {
         }).forEach(el => {
             rowContainer.appendChild(el);
         });
+        rowContainer.className = 'dataview-row_container';
+        rowContainer.style.width   = this.helper.px(totalWidth);
         var clear = document.createElement('div');
         clear.style.clear = 'both';
         rowContainer.appendChild(clear);
@@ -471,16 +493,20 @@ export class DataTable {
     createColumn(c) {
         var div = document.createElement('div');
         var e = document.createElement('div');
+
         e.style.position = 'relative';
         var inside = document.createElement('div');
 
         var handle = this.createResizeHandle(c.index);
         e.appendChild(handle);
+        e.className = 'dataview-column_outside';
 
         inside.innerText = c.label;
         inside.style['padding-left'] = this.helper.px(this.config.column.padding_left);
         inside.style['padding-top'] = this.helper.px(this.config.column.padding_top);
+        inside.style['padding-bottom'] = this.helper.px(this.config.column.padding_bottom);
         inside.style['overflow'] = 'hidden';
+        inside.className = 'dataview-column_inside';
         inside.style['white-space'] = 'nowrap';
         e.style.position = 'relative';
         e.style.float = 'left';
@@ -498,4 +524,6 @@ export class DataTable {
         this.holders.viewport_content.style.height = this.helper.px(this.config.row.height * this.data.rows.length);
         this.renderVisible();
     }
-}
+};
+
+module.exports = DataTable;

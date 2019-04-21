@@ -39,16 +39,23 @@ export class Nifty {
                 }
             });
         };
-        flatten(tree.children);
         console.log(index);
 
         if (tree) {
             vm.$store.state.folders = [
                 {
                     "name": "schema",
-                    "tree": tree
+                    "tree": dirTree('/users/rikard/git/trustly/schema')
+                },
+                {
+                    "name": "frontend",
+                    "tree": dirTree('/users/rikard/git/trustly/frontend')
                 }
             ];
+
+            vm.$store.state.folders.forEach(function(f) {
+                flatten(f.tree.children);
+            });
         }
         vm.$store.state.index = index;
 
@@ -56,6 +63,14 @@ export class Nifty {
         var dis = this;
         ipc.on('command', function(event, msg) {
             dis.send.apply(dis, [ msg.command, msg.payload ]);
+        });
+        this.on('tab', (number) => {
+            var tabs = Object.keys(state.tab);
+            number -= 1;
+            console.log('number', number);
+            if (number >= 0 && number < tabs.length) {
+                state.selectTab(tabs[number]);
+            }
         });
         this.on('new', () => {
             var key = state.newTab({
@@ -72,6 +87,21 @@ export class Nifty {
                 }
             });
             state.selectTab(key);
+        });
+        this.on('save', () => {
+            var tab = state.tab[state.selectedTabKey];
+            var filename = tab.viewstate.filename;
+            var content = tab.viewstate.content;
+
+            if (filename && content) {
+                var fs = require('fs');
+                fs.writeFile(filename, content, function (err) {
+                    if (err)
+                        return console.error(err);
+
+                    console.log('file wrote success');
+                });
+            }
         });
         this.on('settings', () => {
             var key = state.newTab({
@@ -105,7 +135,6 @@ export class Nifty {
             }
         });
         this.on('execute-query', async () => {
-            console.log('EXECUTE QUERY');
             var state = vm.$store.state;
             var content = state.tab[state.selectedTabKey].viewstate.content;
             await this.executeQuery(this.vm, content);
@@ -165,14 +194,19 @@ export class Nifty {
                 Vue.set(query, 'msg', 'Query run successfully.');
                 Vue.set(query, 'selected', 1);
             }
+            Vue.set(query.result, 'hide', false);
         })
         .catch(function(err) {
-            query.error = err.message;
-            query.msg = 'Statement failed with errors.';
+            if (err.message) {
+                query.error = err.message;
+                query.msg = 'Statement failed with errors.';
+                Vue.set(query.result, 'hide', false);
+            } else {
+                Vue.set(query.result, 'hide', true);
+            }
         })
         .finally(function() {
             Vue.set(query, 'executing', false);
-            Vue.set(query.result, 'hide', false);
         });
     }
 
@@ -217,6 +251,7 @@ export class Nifty {
                         name: filename,
                         type: 'sql',
                         viewstate: {
+                            filename: path,
                             content: contents,
                             selected: -1,
                             executing: false,

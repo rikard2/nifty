@@ -27,7 +27,7 @@
         </div>
     </div>
     <div class="status-bar">
-        <div class="filename">{{ $store.state.filename }}</div>
+        <div class="filename">{{ filename }}</div>
     </div>
 </div>
 </template>
@@ -52,6 +52,11 @@ export default {
     },
     directives: {
         resize: ResizeDirective
+    },
+    computed: {
+        filename: function() {
+            return ( (this.$store.state.tab[this.$store.state.selectedTabKey] || {}).viewstate || {}).filename;
+        }
     },
     components: {
         editor: Editor,
