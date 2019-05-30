@@ -34,6 +34,8 @@ export default {
         padding-left: 10px;
         width: 100%;
         height: 100%;
+        font-family: "Source Sans Pro";
+        font-size: 15px;
     }
     ul {
       list-style: none;

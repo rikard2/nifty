@@ -5,7 +5,7 @@
         <img v-if="isFolder" style="float: left; margin-right: 5px; margin-top: 3px;" id="logo" width="12" height="12" :src="require(`@/assets/icons/folder.svg`)">
         <img v-if="!isFolder" style="float: left; margin-right: 5px; margin-top: 3px;" id="logo" width="12" height="12" :src="require(`@/assets/icons/treeview_file.svg`)">
         <div
-        style="overflow: hidden; font-family: system-ui; font-weight: normal; font-size: 13px;height: 20px; cursor: default;"
+        style="overflow: hidden; font-weight: normal;height: 20px; cursor: default;"
         :class="{folder: isFolder, file: !isFolder }"
         @click="toggle"
         @dblclick="changeType">
