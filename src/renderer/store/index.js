@@ -25,6 +25,14 @@ export default new Vuex.Store({
                             'name': 'Local',
                             'group': 'trustly',
                             'url': 'postgres://127.0.0.1:5432/rikardjavelind'
+                        },
+                        {
+                            'name': 'Live',
+                            'user': 'rikardjavelind',
+                            'host': '127.0.0.1',
+                            'port': 5555,
+                            'database': 'gluepay',
+                            'password': true
                         }
                     ]
                 }
@@ -57,6 +65,12 @@ export default new Vuex.Store({
                     'name': 'Vagrant',
                     'group': 'trustly',
                     'url': 'postgres://vagrant@192.168.56.125:5432/vagrant'
+                },
+                'live': {
+                    'name': 'Live',
+                    'group': 'trustly',
+                    'url': 'postgres://rikardjavelind:password@127.0.0.1:5555/gluepay?ssl=require',
+                    'password': true
                 }
             },
             lookups: {

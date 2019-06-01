@@ -1,4 +1,5 @@
 const { Client } = require('pg')
+import { Modal } from './modal.js';
 
 export class DB {
     vm = null;
@@ -56,6 +57,7 @@ export class DB {
     }
 
     async queryAsync(alias, query) {
+        process.env['PGSSLMODE'] = 'require';
         var state = this.vm.$store.state;
 
         var conf = this.config['connections'][alias];
@@ -64,16 +66,27 @@ export class DB {
         var client = state.connections[alias];
 
         if (!client) {
+            if (conf.password) {
+                var password = await Modal.password();
+                conf.url = conf.url.replace('password', password);
+            }
             client = state.connections[alias] = new Client({
                 connectionString: conf.url
             });
+            if (conf.password) {
+                //client.ssl = 'require';
+            }
             console.log('connecting');
             try {
+                console.log('connect', client);
                 client.connect();
             } catch(err) {
                 connect.err('Failed connect', err);
             }
-            console.log('connecting...done');
+            console.log('connecting...done', client);
+            if (conf.password) {
+                //client.connection.ssl = 'require';
+            }
         }
 
         var result = await this.clientQuery(client, query);
@@ -81,7 +94,7 @@ export class DB {
     }
     async clientQuery(client, query) {
         var dis = this;
-        console.log('before prom');
+        console.log('before prom', client);
         return new Promise((resolve, reject) => {
             var notices = [];
             console.log('2');
@@ -93,10 +106,10 @@ export class DB {
                 notices.push(n);
                 console.log('notice', n);
             });
-            console.log('3');
+            console.log('3', client);
 
             client.query(query, (err, res) => {
-                console.log('4');
+                console.log('4', err, res, client);
                 if (err) {
                     console.error('rejecting', err);
                     return reject(err);

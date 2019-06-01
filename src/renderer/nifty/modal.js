@@ -17,7 +17,22 @@ export class Modal {
             })
         });
     }
-    static show(component, model) {
+
+    static password() {
+        return new Promise(function(f, r) {
+            Modal.show('Password', null)
+            .then(function(choice) {
+                console.log('password is', choice);
+                f(choice);
+            }, function(e) {
+                console.log('password REJECTED');
+                r(e);
+            })
+        });
+    }
+
+    static show(component, model, nifty) {
+        var dis = this;
         var promise = new Promise(function(fulfill, reject) {
             var overlay = document.createElement('div');
             overlay.style.position = 'absolute';
@@ -47,6 +62,7 @@ export class Modal {
             var ModalComponent = require('../components/Modals/' + component + '.vue').default;
             var components = {};
             components[component] = ModalComponent;
+
             var v = new Vue({
                 name: component,
                 data: function() {
@@ -62,25 +78,22 @@ export class Modal {
                         document.body.removeChild(content);
                         document.body.removeChild(overlay);
                         v.$destroy();
-                        document.removeEventListener('keydown', onKeyDown);
                         fulfill(choice);
+                    },
+                    onEscape: function() {
+                        document.body.removeChild(content);
+                        document.body.removeChild(overlay);
+                        v.$destroy();
+                        fulfill();
                     }
                 },
-                template: '<div style="width: 100%;height: 100%;"><' + component + ' v-on:onchoice="onChoice" v-model="this.model"></' + component + '></div>'
+                template: '<div style="width: 100%;height: 100%;"><' + component + ' v-on:onescape="onEscape" v-on:onchoice="onChoice" v-model="this.model"></' + component + '></div>'
             });
             v.$mount(compElement);
-            var onKeyDown = function(e) {
-                if (e.key == 'Escape') {
-                    document.body.removeChild(content);
-                    document.body.removeChild(overlay);
-                    v.$destroy();
-                    document.removeEventListener('keydown', onKeyDown);
-                    fulfill();
-                }
-            };
-            document.addEventListener('keydown', onKeyDown);
+            if (component == 'lookup') {
+                console.log('NIFTY', nifty);
+            }
         });
-
         return promise;
     }
 }

@@ -1,6 +1,6 @@
 <template>
     <div style="height: 400px;">
-        <data-table v-model="value"></data-table>
+        <data-table v-model="value" v-on:onescape="onEscape"></data-table>
     </div>
 </template>
 
@@ -8,6 +8,7 @@
 import DataTable from '../DataTable';
 export default {
     name: 'Lookup',
+    events: ['onescape'],
     props: ['value'],
     components: {
         dataTable: DataTable
@@ -16,6 +17,9 @@ export default {
         console.log('Lookup BEFORE mount?');
     },
     methods: {
+        onEscape: function() {
+            this.$emit('onescape');
+        }
     }
 }
 </script>

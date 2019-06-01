@@ -8,8 +8,29 @@ export class Nifty {
     activeDataTable = null;
     vm = null;
 
+    dataTables = [];
+
     getActiveTab() {
         return this.vm.$store.state.tabs[this.vm.$store.state.activeTab.index];
+    }
+
+    getActiveDataTable() {
+        if (this.dataTables.length > 0) return this.dataTables[this.dataTables.length - 1];
+
+        return null;
+    }
+
+    setActiveDataTable(dt) {
+        if (this.dataTables.indexOf(dt) === -1) {
+            this.dataTables.push(dt);
+        }
+    }
+
+    removeDataTable(dt) {
+        this.dataTables.splice(this.dataTables.indexOf(dt), 1);
+
+        var x = this.getActiveDataTable();
+        if (x) x.focus();
     }
 
     constructor(vm) {
@@ -226,6 +247,7 @@ export class Nifty {
     }
 
     async getLookup(columnName) {
+        console.log('getLookup', columnName);
         var lookups = this.vm.$store.state.config.lookups[columnName];
         if (lookups.length == 1) return lookups[0]
         else if (lookups.length > 1) {
@@ -278,31 +300,33 @@ export class Nifty {
     async lookup() {
         var connection = await this.getTabConnection(this.vm);
         var config = this.vm.$store.state.config;
-        var selected = this.activeDataTable.selection.getSelectedRange();
+        var selected = this.getActiveDataTable().selection.getSelectedRange();
 
         if (selected.length > 0) {
             var x = selected[0][0];
             var y = selected[0][1];
-            var column = this.activeDataTable.getColumn(x);
+            var column = this.getActiveDataTable().getColumn(x);
             if (column.name && (config.lookups || {})[column.name]) {
                 var lookup = await this.getLookup(column.name);
                 if (!lookup) throw("No lookup found");
 
-                var value = this.activeDataTable.getCellValue(x, y);
-                var values = this.activeDataTable.getCellValues(selected);
+                console.log('lookup', lookup);
+
+                var value = this.getActiveDataTable().getCellValue(x, y);
+                var values = this.getActiveDataTable().getCellValues(selected);
                 if (lookup.type == 'json') {
                     var json = {};
                     try { json = JSON.parse(value); } catch (e) { throw('Could not parse JSON'); }
                     await Modal.show('JSON', json);
-                    this.vm.nifty.activeDataTable.focus();
+                    this.vm.nifty.getActiveDataTable().focus();
                 } else if (lookup.query) {
                     var query = lookup.query.replace('$ID$', value).replace('$IDS$', values);
                     var connection = await this.getTabConnection(this.vm);
                     var result = await this.vm.nifty.db.queryAsync(connection, query);
-                    this.vm.$store.state.tabs[this.vm.$store.state.activeTab.index].connection = connection;
+                    //this.vm.$store.state.tabs[this.vm.$store.state.activeTab.index].connection = connection;
 
-                    await Modal.show('Lookup', result.resultsets[0]);
-                    this.vm.nifty.activeDataTable.focus();
+                    await Modal.show('Lookup', result.resultsets[0], this.vm.nifty);
+                    this.vm.nifty.getActiveDataTable().focus();
                 }
             };
         }

@@ -26,6 +26,10 @@ export class DataTable {
         document.removeEventListener("keydown", this.keyDownListener);
     }
 
+    onEscape(fn) {
+        this.escape = fn;
+    }
+
     create() {
         this.rootElement.innerHTML = '';
         this.holders = this.createHolders()
@@ -128,6 +132,7 @@ export class DataTable {
         var dis = this;
         this.keyDownListener = function(e) {
             if (e.key == 'Escape') {
+                console.log('ESCAPE!!!');
                 dis.escape();
             } else {
                 dis.selection.onKeyDown.apply(dis.selection, [e]);
@@ -414,7 +419,6 @@ export class DataTable {
         }
         if (col.label.length > max) max = col.label.length;
         var width = max * 10;
-        console.log('column', col.label, col.type, max, width);
         if (width > 200) return 300;
         if (width < 50) return 100;
         return width;
@@ -525,5 +529,3 @@ export class DataTable {
         this.renderVisible();
     }
 };
-
-module.exports = DataTable;
