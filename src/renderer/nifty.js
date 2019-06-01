@@ -142,22 +142,24 @@ export class Nifty {
         this.on('close-tab', () => {
             state.closeTab(state.selectedTabKey);
         });
-        this.on('execute-selected-query', async () => {
-            var index = vm.$store.state.activeTab.index;
-            var content2 = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.content;
-            console.log('contents', content2);
-            if (dis.activeEditor) {
-                var index = vm.$store.state.activeTab.index;
-                var content = dis.activeEditor.getSelectedText();
-                var content2 = vm.$store.state.tabs[vm.$store.state.activeTab.index].viewstate.content;
-                console.log('contents', content, content2);
-
-                await this.executeQuery(this.vm, content);
-            }
-        });
         this.on('execute-query', async () => {
             var state = vm.$store.state;
+            var selection = state.tab[state.selectedTabKey].viewstate.selection;
             var content = state.tab[state.selectedTabKey].viewstate.content;
+
+            if (selection) content = selection;
+            await this.executeQuery(this.vm, content);
+        });
+        this.on('execute-selected-lookup', async () => {
+            var state = vm.$store.state;
+            var content = state.tab[state.selectedTabKey].viewstate.selection;
+
+            var connection = await this.getTabConnection(this.vm);
+            var result = await this.vm.nifty.db.queryAsync(connection, content);
+
+            await Modal.show('Lookup', result.resultsets[0], this.vm.nifty);
+            this.vm.nifty.getActiveDataTable().focus();
+
             await this.executeQuery(this.vm, content);
         });
     }

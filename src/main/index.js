@@ -155,11 +155,11 @@ const template = [
                 }
             },
             {
-                label: 'Execute Selected Query',
+                label: 'Execute Selected Lookup',
                 accelerator: 'Cmd+Shift+Enter',
                 click() {
                     mainWindow.webContents.send('command', {
-                        command: 'execute-selected-query'
+                        command: 'execute-selected-lookup'
                     });
                 }
             }

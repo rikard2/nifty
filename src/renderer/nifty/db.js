@@ -57,7 +57,6 @@ export class DB {
     }
 
     async queryAsync(alias, query) {
-        process.env['PGSSLMODE'] = 'require';
         var state = this.vm.$store.state;
 
         var conf = this.config['connections'][alias];
@@ -66,17 +65,15 @@ export class DB {
         var client = state.connections[alias];
 
         if (!client) {
-            if (conf.password) {
-                var password = await Modal.password();
-                conf.url = conf.url.replace('password', password);
-            }
+            process.env['PGSSLMODE'] = conf.sslmode || 'disable';
             client = state.connections[alias] = new Client({
                 connectionString: conf.url
             });
             if (conf.password) {
-                //client.ssl = 'require';
+                var password = await Modal.password();
+                client.password = password;
+                //conf.url = conf.url.replace('password', password);
             }
-            console.log('connecting');
             try {
                 console.log('connect', client);
                 client.connect();
@@ -84,9 +81,6 @@ export class DB {
                 connect.err('Failed connect', err);
             }
             console.log('connecting...done', client);
-            if (conf.password) {
-                //client.connection.ssl = 'require';
-            }
         }
 
         var result = await this.clientQuery(client, query);

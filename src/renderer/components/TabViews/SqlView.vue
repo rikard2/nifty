@@ -8,7 +8,7 @@
                 </toolbar>
             </div>
             <div style="flex: 1 auto;width: 100%;height: 100%;">
-                <editor :content="value.viewstate.content" v-on:change="editorchange"></editor>
+                <editor :content="value.viewstate.content" v-on:change="editorchange" v-on:selection="selectionchange"></editor>
             </div>
         </div>
         <div v-if="query && !query.result.hide" v-resize="{ direction: 'vertical' }" style="flex-basis: 250px; display:flex; flex-direction: column" class="sql-view-resultset" :key="value.name">
@@ -110,6 +110,10 @@ export default {
         },
         editorchange: function(c) {
             this.value.viewstate.content = c;
+        },
+        selectionchange: function(c) {
+            console.log('SELECTION CHANGE !!!', c);
+            this.value.viewstate.selection = c;
         }
     }
 }

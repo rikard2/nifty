@@ -69,7 +69,8 @@ export default new Vuex.Store({
                 'live': {
                     'name': 'Live',
                     'group': 'trustly',
-                    'url': 'postgres://rikardjavelind:password@127.0.0.1:5555/gluepay?ssl=require',
+                    'url': 'postgres://rikardjavelind@127.0.0.1:5555/gluepay?ssl=require',
+                    'sslmode': 'require',
                     'password': true
                 }
             },

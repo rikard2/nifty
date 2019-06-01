@@ -1,6 +1,6 @@
 <template>
     <div class="sql-editor">
-        <ace-editor :value="content" @input="change" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
+        <ace-editor :value="content" @selection="selection" @input="change" @init="editorInit" lang="sql" theme="tomorrow" class="ace"></ace-editor>
     </div>
 </template>
 
@@ -8,7 +8,7 @@
 export default {
     name: 'editor',
     props: ['content'],
-    events: ['change'],
+    events: ['change', 'selection'],
     components: {
         aceEditor: require('./ace.js')
     },
@@ -17,6 +17,9 @@ export default {
     methods: {
         change: function(c) {
             this.$emit('change', c);
+        },
+        selection: function(c) {
+            this.$emit('selection', c);
         },
         editorInit: function () {
             require('brace/mode/html')

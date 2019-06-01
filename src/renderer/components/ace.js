@@ -125,6 +125,12 @@ module.exports = {
             vm.contentBackup = content;
         });
 
+        editor.getSession().selection.on('changeSelection', function (e)
+        {
+            var selectedText = editor.getSelectedText();
+            vm.$emit('selection', selectedText);
+        });
+
         if(vm.options)
             editor.setOptions(vm.options);
 
